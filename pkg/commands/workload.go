@@ -70,6 +70,7 @@ Workload configuration includes:
 	cmd.AddCommand(NewWorkloadUpdateCommand(ctx, c))
 	cmd.AddCommand(NewWorkloadApplyCommand(ctx, c))
 	cmd.AddCommand(NewWorkloadDeleteCommand(ctx, c))
+	cmd.AddCommand(NewWorkloadTreeCommand(ctx, c))
 
 	return cmd
 }

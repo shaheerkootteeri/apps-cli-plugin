@@ -86,6 +86,7 @@ func (opts *WorkloadTailOptions) Exec(ctx context.Context, c *cli.Config) error 
 	if opts.Component != "" {
 		labelSelector = fmt.Sprintf("%s=%s,%s=%s", cartov1alpha1.WorkloadLabelName, workload.Name, apis.ComponentLabelName, opts.Component)
 	}
+
 	selector, err := labels.Parse(labelSelector)
 	if err != nil {
 		panic(err)
