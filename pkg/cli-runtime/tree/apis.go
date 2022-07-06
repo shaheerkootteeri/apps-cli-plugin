@@ -43,20 +43,12 @@ func FullAPIName(a ApiResource) string {
 }
 
 func FindAPIs(ctx context.Context, c *cli.Config) (*resourceMap, error) {
-	// workload := &cartov1alpha1.Workload{}
-	// start := time.Now()
-	// dc, err := cf.ToDiscoveryClient()
-	// if err != nil {
-	// 	return err
-	// }
 
 	client := c.Client.Discovery()
 	resList, err := client.ServerPreferredResources()
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch api groups from kubernetes: %w", err)
 	}
-	// c.Infof("queried api discovery in %v", time.Since(start))
-	// c.Infof("found %d items (groups) in server-preferred APIResourceList", len(resList))
 
 	rm := &resourceMap{
 		m: make(resourceNameLookup),

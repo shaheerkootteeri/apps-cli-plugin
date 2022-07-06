@@ -33,6 +33,7 @@ import (
 	cartov1alpha1 "github.com/vmware-tanzu/apps-cli-plugin/pkg/apis/cartographer/v1alpha1"
 	cli "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime"
 	"github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime/tree"
+	"github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime/validation"
 	"github.com/vmware-tanzu/apps-cli-plugin/pkg/completion"
 	"github.com/vmware-tanzu/apps-cli-plugin/pkg/flags"
 )
@@ -42,17 +43,17 @@ const (
 )
 
 type WorkloadTreeOptions struct {
-	Namespace string
-	Name      string
-
-	Component  string
-	Since      time.Duration
-	Timestamps bool
+	Namespace     string
+	Name          string
+	AllNamespaces bool
+	Component     string
+	Since         time.Duration
+	Timestamps    bool
 }
 
 var (
-	// _ validation.Validatable = (*WorkloadTreeOptions)(nil)
-	_ cli.Executable = (*WorkloadTreeOptions)(nil)
+	_ validation.Validatable = (*WorkloadTreeOptions)(nil)
+	_ cli.Executable         = (*WorkloadTreeOptions)(nil)
 )
 
 func (opts *WorkloadTreeOptions) Exec(ctx context.Context, c *cli.Config) error {
@@ -67,10 +68,12 @@ func (opts *WorkloadTreeOptions) Exec(ctx context.Context, c *cli.Config) error 
 	}
 
 	restConfig := c.KubeRestConfig()
-	restConfig.QPS = 1000
-	restConfig.Burst = 1000
+	restConfig.QPS = 1000   //need discussions and alignement from Rashed
+	restConfig.Burst = 1000 //need discussions and alignement from Rashed
 	dyn, err := dynamic.NewForConfig(restConfig)
-	fmt.Println(dyn)
+	if err != nil {
+		return fmt.Errorf("failed to construct dynamic client: %w", err)
+	}
 	apis, err := tree.FindAPIs(ctx, c)
 	if err != nil {
 		return err
@@ -99,8 +102,11 @@ func (opts *WorkloadTreeOptions) Exec(ctx context.Context, c *cli.Config) error 
 		api = apiResults[0]
 	}
 	ns := opts.Namespace
-	allNs := true
-	// c.Infof("namespace=%s allNamespaces=%v", ns, allNs)
+	command := cli.CommandFromContext(ctx)
+	allNs, err := command.Flags().GetBool(allNamespacesFlag)
+	if err != nil {
+		allNs = false
+	}
 
 	var ri dynamic.ResourceInterface
 	if api.ApiRsrc.Namespaced {
@@ -112,14 +118,10 @@ func (opts *WorkloadTreeOptions) Exec(ctx context.Context, c *cli.Config) error 
 	if err != nil {
 		return fmt.Errorf("failed to get %s/%s: %w", kind, name, err)
 	}
-	// c.Infof("target parent object: %#v", obj)
-
-	// c.Infof("querying all api objects")
 	apiObjects, err := tree.GetAllResources(dyn, apis.Resources(), allNs)
 	if err != nil {
 		return fmt.Errorf("error while querying api objects: %w", err)
 	}
-	// c.Infof("found total %d api objects", len(apiObjects))
 
 	objs := tree.NewObjectDirectory(apiObjects)
 	if len(objs.Ownership[obj.GetUID()]) == 0 {
@@ -127,9 +129,28 @@ func (opts *WorkloadTreeOptions) Exec(ctx context.Context, c *cli.Config) error 
 		return nil
 	}
 	tree.TreeView(os.Stderr, objs, *obj)
-	// c.Infof("done printing tree view")
 	return nil
 
+}
+func (opts *WorkloadTreeOptions) Validate(ctx context.Context) validation.FieldErrors {
+	errs := validation.FieldErrors{}
+
+	if opts.Namespace == "" {
+		errs = errs.Also(validation.ErrMissingField(flags.NamespaceFlagName))
+	}
+
+	if opts.Name == "" {
+		errs = errs.Also(validation.ErrMissingField(cli.NameArgumentName))
+	} else {
+		errs = errs.Also(validation.K8sName(opts.Name, cli.NameArgumentName))
+	}
+
+	if opts.Since < 0 {
+		errs = errs.Also(validation.ErrInvalidValue(opts.Since, flags.SinceFlagName))
+	}
+
+	errs = errs.Also(validation.K8sLabelValue(opts.Component, flags.ComponentFlagName))
+	return errs
 }
 func NewWorkloadTreeCommand(ctx context.Context, c *cli.Config) *cobra.Command {
 	opts := &WorkloadTreeOptions{}
@@ -144,7 +165,7 @@ Tree for the sub-resource with stauses and details for workload
 			fmt.Sprintf("%s workload tree my-workload", c.Name),
 			fmt.Sprintf("%s workload tree my-workload %s 1h", c.Name, flags.SinceFlagName),
 		}, "\n"),
-		// PreRunE:           cli.ValidateE(ctx, opts),
+		PreRunE:           cli.ValidateE(ctx, opts),
 		RunE:              cli.ExecE(ctx, c, opts),
 		ValidArgsFunction: completion.SuggestWorkloadNames(ctx, c),
 	}
@@ -163,25 +184,3 @@ Tree for the sub-resource with stauses and details for workload
 	cmd.RegisterFlagCompletionFunc(cli.StripDash(flags.SinceFlagName), completion.SuggestDurationUnits(ctx, completion.CommonDurationUnits))
 	return cmd
 }
-
-// func init() {
-// 	klog.InitFlags(nil)
-// 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
-
-// 	// hide all glog flags except for -v
-// 	// flag.CommandLine.VisitAll(func(f *flag.Flag) {
-// 	// 	if f.Name != "v" {
-// 	// 		pflag.Lookup(f.Name).Hidden = true
-// 	// 	}
-// 	// })
-
-// 	// cf = genericclioptions.NewConfigFlags(true)
-
-// 	// cmd.Flags().BoolP(allNamespacesFlag, "A", false, "query all objects in all API groups, both namespaced and non-namespaced")
-
-// 	// cf.AddFlags(rootCmd.Flags())
-// 	if err := flag.Set("logtostderr", "true"); err != nil {
-// 		fmt.Fprintf(os.Stderr, "failed to set logtostderr flag: %v\n", err)
-// 		os.Exit(1)
-// 	}
-// }
