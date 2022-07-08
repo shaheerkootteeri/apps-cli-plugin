@@ -25,18 +25,21 @@ var (
 	green = color.New(color.FgGreen)
 )
 
+type supplychainTemplate string // Needs to move to a different class later
+type supplyChain string
+
 // treeView prints object hierarchy to out stream.
 func TreeView(out io.Writer, objs objectDirectory, obj unstructured.Unstructured) {
 	tbl := uitable.New()
 	tbl.Separator = "  "
-	tbl.AddRow("NAMESPACE", "NAME", "READY", "REASON", "AGE")
+	tbl.AddRow("NAMESPACE", "NAME", "READY", "REASON", "supply chain template", "supply chain", "AGE")
 	treeViewInner("", tbl, objs, obj)
 	fmt.Fprintln(color.Output, tbl)
 }
 
 func treeViewInner(prefix string, tbl *uitable.Table, objs objectDirectory, obj unstructured.Unstructured) {
 	ready, reason := extractStatus(obj)
-
+	supplychainTemplate, supplyChain := extractSupplyChainDetails(obj)
 	var readyColor *color.Color
 	switch ready {
 	case "True":
@@ -62,6 +65,8 @@ func treeViewInner(prefix string, tbl *uitable.Table, objs objectDirectory, obj 
 		color.New(color.Bold).Sprint(obj.GetName())),
 		readyColor.Sprint(ready),
 		readyColor.Sprint(reason),
+		readyColor.Sprint(supplychainTemplate),
+		readyColor.Sprint(supplyChain),
 		age)
 	chs := objs.ownedBy(obj.GetUID())
 	for i, child := range chs {
@@ -90,4 +95,52 @@ func printPrefix(p string) string {
 		p = strings.ReplaceAll(p, lastElemPrefix, strings.Repeat(" ", len([]rune(lastElemPrefix))))
 	}
 	return p
+}
+
+func extractSupplyChainDetails(obj unstructured.Unstructured) (supplychainTemplate, supplyChain) {
+	metadata, ok := obj.Object["metadata"]
+	templateValue := ""
+	supplyChainName := ""
+
+	if !ok {
+		return "", ""
+	}
+	metadataV, ok := metadata.(map[string]interface{})
+	if !ok {
+		return "", ""
+	}
+	labelsF, ok := metadataV["labels"]
+	if !ok {
+		return "", ""
+	}
+	labelsV, ok := labelsF.(map[string]interface{})
+	if !ok {
+		return "", ""
+	}
+
+	for key, value := range labelsV {
+		// condM, ok := key.(string)
+		// if !ok {
+		// 	return "", ""
+		// }
+		// condType, ok := condM["type"].(string)
+		// if !ok {
+		// 	return "", ""
+		// }
+		if key == "carto.run/template-kind" {
+			templateValue, ok = value.(string)
+			if !ok {
+				return "", ""
+			}
+		}
+		if key == "carto.run/supply-chain-name" {
+			supplyChainName, ok = value.(string)
+			if !ok {
+				return "", ""
+			}
+		}
+
+	}
+
+	return supplychainTemplate(templateValue), supplyChain(supplyChainName)
 }
