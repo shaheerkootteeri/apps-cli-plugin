@@ -24,6 +24,7 @@ import (
 	"io"
 	"net/url"
 	"os"
+	runtm "runtime"
 	"strings"
 	"testing"
 	"time"
@@ -1909,6 +1910,10 @@ func TestWorkloadOptionsPublishLocalSource(t *testing.T) {
 	u, err := url.Parse(reg.URL)
 	utilruntime.Must(err)
 	registryHost := u.Host
+	expectedImageDigest := "fedc574423e7aa2ecdd2ffb3381214e3c288db871ab9a3758f77489d6a777a1d"
+	if runtm.GOOS == "windows" {
+		expectedImageDigest = "4b931bb7ef0a7780a3fc58364aaf8634cf4885af6359fb692461f0247c8a9f34"
+	}
 
 	tests := []struct {
 		name             string
@@ -1922,7 +1927,7 @@ func TestWorkloadOptionsPublishLocalSource(t *testing.T) {
 		name:     "local source with excluded files",
 		args:     []string{flags.LocalPathFlagName, "testdata/local-source-exclude-files", flags.YesFlagName},
 		input:    fmt.Sprintf("%s/hello:source", registryHost),
-		expected: fmt.Sprintf("%s/hello:source@sha256:%s", registryHost, "fedc574423e7aa2ecdd2ffb3381214e3c288db871ab9a3758f77489d6a777a1d"),
+		expected: fmt.Sprintf("%s/hello:source@sha256:%s", registryHost, expectedImageDigest),
 		expectedOutput: `
 The files and/or directories listed in the .tanzuignore file are being excluded from the uploaded source code.
 Publishing source in "testdata/local-source-exclude-files" to "` + registryHost + `/hello:source"...

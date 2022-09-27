@@ -112,16 +112,13 @@ jobs:
         tanzu plugin list
 
     - name: Test
-      shell: bash
       run: make test
     - name: Build Version
-      shell: bash
-      run: echo "BUILD_VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+
+      run: echo "BUILD_VERSION=${GITHUB_REF/refs\/tags\//}" >> $env:GITHUB_ENV
       if: startsWith(github.ref, 'refs/tags/')
     - name: Build
-      shell: bash
-      run: |
-        make publish
+      run: make publish
     - uses: actions/upload-artifact@v3
       with:
         name: tanzu-apps-plugin.tar.gz
@@ -330,6 +327,7 @@ jobs:
       if: always()
 
   acceptancewindows:
+    needs: unitwindows
     runs-on: windows-latest
     strategy:
       matrix:
@@ -343,7 +341,7 @@ jobs:
       REGISTRY_PASSWORD: rpass
       BUNDLE: registry.local/integration-test/hellojar:source
       TANZU_CLI_NO_INIT: true
-      TANZU_HOME: $HOME/tanzu
+      TANZU_HOME: c:/Program\ Files/tanzu
       OS_ARCH: linux-amd64
       TKG_CUSTOM_IMAGE_REPOSITORY: projects-stg.registry.vmware.com/tkg
     steps:
@@ -429,16 +427,16 @@ jobs:
       run: |
         TANZU_VERSION=$(cat TANZU_VERSION)
         mkdir -p ${TANZU_HOME}
-        curl -Lo tanzu-framework.tar.gz https://github.com/vmware-tanzu/tanzu-framework/releases/download/${TANZU_VERSION}/tanzu-framework-linux-amd64.tar.gz
-          tar -xzf tanzu-framework.tar.gz -C ${TANZU_HOME}
-          sudo mv ${TANZU_HOME}/cli/core/${TANZU_VERSION}/tanzu-core-linux_amd64 /usr/local/bin/tanzu
-          chmod +x /usr/local/bin/tanzu
+        curl -Lo tanzu-framework-windows-amd64.zip https://github.com/vmware-tanzu/tanzu-framework/releases/download/$TANZU_VERSION/tanzu-framework-windows-amd64.zip
+        tar -xf tanzu-framework-windows-amd64.zip
+        cp "cli\core\$TANZU_VERSION\tanzu-core-windows_amd64.exe" "C:\Program Files\tanzu\tanzu.exe"
         env
         tanzu init
     - name: Build Version
       run: echo "BUILD_VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
       if: startsWith(github.ref, 'refs/tags/')
     - name: Install CLI
+      
       run: |
         set -o errexit
         set -o nounset

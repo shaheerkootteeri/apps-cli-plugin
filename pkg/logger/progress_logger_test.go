@@ -23,6 +23,7 @@ import (
 	"io"
 	"os"
 	"regexp"
+	"runtime"
 	"testing"
 	"time"
 
@@ -54,6 +55,9 @@ func TestProgressBar(t *testing.T) {
 	}}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			if runtime.GOOS == "windows" {
+				t.Skip()
+			}
 			// store os,stderr
 			oldStdErr := os.Stderr
 			r, w, _ := os.Pipe()
