@@ -370,14 +370,23 @@ jobs:
         $Env:PATH += ";C:\Program Files\tanzu"
         $Env:TANZU_CLI_NO_INIT = "true"
         $Env:BUNDLE = "registry.local/integration-test/hellojar:source"
-        $Env:REGISTRY_NAME: "registry.local"
-        $Env:REGISTRY_USERNAME: "ruser"
-        $Env:REGISTRY_PASSWORD: "rpass"
-        $Env:OS_ARCH: windows-amd64
-        $Env:TKG_CUSTOM_IMAGE_REPOSITORY: projects-stg.registry.vmware.com/tkg
+        $Env:REGISTRY_NAME= "registry-local"
+        $Env:REGISTRY_USERNAME= "ruser"
+        $Env:REGISTRY_PASSWORD= "rpass"
+        $Env:OS_ARCH= windows-amd64
+        $Env:TKG_CUSTOM_IMAGE_REPOSITORY= projects-stg.registry.vmware.com/tkg
     - name: Generate certs
       shell: bash
       run: |
+        $Env:TANZU_HOME = "C:\Program Files\tanzu"
+        $Env:PATH += ";C:\Program Files\tanzu"
+        $Env:TANZU_CLI_NO_INIT = "true"
+        $Env:BUNDLE = "registry.local/integration-test/hellojar:source"
+        $Env:REGISTRY_NAME= "registry-local"
+        $Env:REGISTRY_USERNAME= "ruser"
+        $Env:REGISTRY_PASSWORD= "rpass"
+        $Env:OS_ARCH= windows-amd64
+        $Env:TKG_CUSTOM_IMAGE_REPOSITORY= projects-stg.registry.vmware.com/tkg
         set -o errexit
         set -o nounset
         set -o pipefail
@@ -411,6 +420,7 @@ jobs:
     - name: Setup local registry
       shell: bash
       run: |
+        
         set -o errexit
         set -o nounset
         set -o pipefail
@@ -434,8 +444,9 @@ jobs:
         echo "$(hostname -I | cut -d' ' -f1) $REGISTRY_NAME" | sudo tee -a /etc/hosts
     - name: Install tanzu cli
       run: |
-        TANZU_VERSION=$(cat TANZU_VERSION)
-        mkdir -p ${TANZU_HOME}
+        $TANZU_VERSION = "v0.25.0"
+        mkdir "C:\Program Files\tanzu"
+        $Env:PATH += ";C:\Program Files\tanzu"
         curl -Lo tanzu-framework-windows-amd64.zip https://github.com/vmware-tanzu/tanzu-framework/releases/download/$TANZU_VERSION/tanzu-framework-windows-amd64.zip
         tar -xf tanzu-framework-windows-amd64.zip
         cp "cli\core\$TANZU_VERSION\tanzu-core-windows_amd64.exe" "C:\Program Files\tanzu\tanzu.exe"
