@@ -46,6 +46,7 @@ jobs:
         curl -Lo admin-plugins.tar.gz https://github.com/vmware-tanzu/tanzu-framework/releases/download/${TANZU_VERSION}/tanzu-framework-plugins-admin-linux-amd64.tar.gz
         tar -xzf admin-plugins.tar.gz -C ${TANZU_HOME}
         tanzu plugin install builder --local ${TANZU_HOME}/admin-plugins
+        tanzu builder version
         tanzu plugin install test --local ${TANZU_HOME}/admin-plugins
         tanzu plugin list
     - name: Test
@@ -101,6 +102,7 @@ jobs:
         curl -Lo tanzu-framework-windows-amd64.zip https://github.com/vmware-tanzu/tanzu-framework/releases/download/$TANZU_VERSION/tanzu-framework-windows-amd64.zip
         tar -xf tanzu-framework-windows-amd64.zip
         cp "cli\core\$TANZU_VERSION\tanzu-core-windows_amd64.exe" "C:\Program Files\tanzu\tanzu.exe"
+        tanzu init
         $Env:TANZU_CLI_NO_INIT = "true"
         tanzu plugin install --local cli all
         tanzu plugin list
@@ -114,11 +116,12 @@ jobs:
     - name: Test
       run: make test
     - name: Build Version
-
       run: echo "BUILD_VERSION=${GITHUB_REF/refs\/tags\//}" >> $env:GITHUB_ENV
       if: startsWith(github.ref, 'refs/tags/')
     - name: Build
-      run: make publish
+      run: |
+        tanzu version
+        make publish
     - uses: actions/upload-artifact@v3
       with:
         name: tanzu-apps-plugin.tar.gz
