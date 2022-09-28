@@ -106,6 +106,7 @@ jobs:
         $Env:TANZU_CLI_NO_INIT = "true"
         tanzu plugin install --local cli all
         tanzu plugin list
+        tanzu version
         tanzu plugin repo add -b tanzu-cli-admin-plugins -n admin -p artifacts-admin
         curl -Lo admin-plugins.zip https://github.com/vmware-tanzu/tanzu-framework/releases/download/$TANZU_VERSION/tanzu-framework-plugins-admin-windows-amd64.zip
         tar -xf admin-plugins.zip -C $TANZU_HOME
@@ -120,7 +121,7 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
     - name: Build
       run: |
-        tanzu version
+        $Env:PATH += ";C:\Program Files\tanzu"
         make publish
     - uses: actions/upload-artifact@v3
       with:
@@ -128,16 +129,19 @@ jobs:
         path: tanzu-apps-plugin*.tar.gz
         retention-days: 1
     - name: Install
-      run: make install
+      run: |
+        $Env:PATH += ";C:\Program Files\tanzu"
+        make install
     - name: Verify docs
       run: |
+        $Env:PATH += ";C:\Program Files\tanzu"
         rm -rf docs/command-reference
         tanzu apps docs --directory docs/command-reference
         git diff --exit-code docs
       continue-on-error: true
 
   acceptance:
-    needs: [unitubuntu, unitwindows]
+    needs: unitubuntu
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -363,6 +367,7 @@ jobs:
       run: |
         echo "BUNDLE= registry.local/integration-test/hellojar:source" >> $env:GITHUB_ENV
         $Env:TANZU_HOME = "C:\Program Files\tanzu"
+        $Env:PATH += ";C:\Program Files\tanzu"
         $Env:TANZU_CLI_NO_INIT = "true"
         $Env:BUNDLE = "registry.local/integration-test/hellojar:source"
         $Env:REGISTRY_NAME: "registry.local"
@@ -404,6 +409,7 @@ jobs:
             | cfssljson -bare ${CERT_DIR}/server
         echo "##[endgroup]"
     - name: Setup local registry
+      shell: bash
       run: |
         set -o errexit
         set -o nounset
@@ -439,27 +445,29 @@ jobs:
       run: echo "BUILD_VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
       if: startsWith(github.ref, 'refs/tags/')
     - name: Install CLI
-      
+      shell: bash
       run: |
         set -o errexit
         set -o nounset
         set -o pipefail
  
         tar -xvf tanzu-apps-plugin.tar.gz
+        $Env:PATH += ";C:\Program Files\tanzu"
         tanzu plugin install apps --local ./${OS_ARCH} --version ${BUILD_VERSION:-v0.0.0-dev}
     - name: Install kind
       run: |
-        cd $(mktemp -d -t kind.XXXX)
-        curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-$(go env GOHOSTOS)-$(go env GOHOSTARCH)
-        chmod +x ./kind
-        sudo mv ./kind /usr/local/bin
-        cd -
+        mkdir "C:\Program Files\kind"
+        $Env:PATH += ";C:\Program Files\kind"
+        curl.exe -Lo kind-windows-amd64.exe https://kind.sigs.k8s.io/dl/v0.16.0/kind-windows-amd64
+        Move-Item .\kind-windows-amd64.exe c:\Program Files\kind\kind.exe
     - name: Create Cluster
+      shell: bash
       run: |
         set -o errexit
         set -o nounset
         set -o pipefail
  
+        $Env:PATH += ";C:\Program Files\kind"
         # KinD configuration.
         # create a cluster with the local registry enabled in containerd
         cat <<EOF | kind create cluster --config=-
@@ -497,6 +505,7 @@ jobs:
             help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
         EOF
     - name: Deploy Cartographer
+      shell: bash
       run: |
         set -o errexit
         set -o nounset
@@ -508,20 +517,20 @@ jobs:
         echo "##[endgroup]"
     - name: Test CLI commands
       run: |
-        set -o errexit
-        set -o nounset
-        set -o pipefail
- 
+        $Env:PATH += ";C:\Program Files\tanzu"
+        $Env:PATH += ";C:\Program Files\kind"
         echo "##[group]Integration Test"
           make integration-test
         echo "##[endgroup]"
       continue-on-error: false
     - name: Delete Gracefully
+      shell: bash
       run: |
         set -o errexit
         set -o nounset
         set -o pipefail
- 
+        $Env:PATH += ";C:\Program Files\tanzu"
+
         echo "##[group]Delete workload"
           printf 'y' | tanzu apps workload delete petclinic
         echo "##[endgroup]"
@@ -531,7 +540,9 @@ jobs:
         echo "##[endgroup]"
       if: always()
     - name: Cleanup cluster
-      run: kind delete cluster
+      run: |
+        $Env:PATH += ";C:\Program Files\kind"
+        kind delete cluster
       if: always()
 
   create-release:
