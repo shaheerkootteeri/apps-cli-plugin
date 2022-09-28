@@ -135,7 +135,7 @@ jobs:
     - name: Verify docs
       run: |
         $Env:PATH += ";C:\Program Files\tanzu"
-        rm -rf docs/command-reference
+        Remove-Item docs/command-reference -Recurse
         tanzu apps docs --directory docs/command-reference
         git diff --exit-code docs
       continue-on-error: true
@@ -378,15 +378,6 @@ jobs:
     - name: Generate certs
       shell: bash
       run: |
-        $Env:TANZU_HOME = "C:\Program Files\tanzu"
-        $Env:PATH += ";C:\Program Files\tanzu"
-        $Env:TANZU_CLI_NO_INIT = "true"
-        $Env:BUNDLE = "registry.local/integration-test/hellojar:source"
-        $Env:REGISTRY_NAME= "registry-local"
-        $Env:REGISTRY_USERNAME= "ruser"
-        $Env:REGISTRY_PASSWORD= "rpass"
-        $Env:OS_ARCH= "windows-amd64"
-        $Env:TKG_CUSTOM_IMAGE_REPOSITORY= "projects-stg.registry.vmware.com/tkg"
         set -o errexit
         set -o nounset
         set -o pipefail
