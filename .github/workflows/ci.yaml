@@ -375,7 +375,52 @@ jobs:
         $Env:REGISTRY_PASSWORD= "rpass"
         $Env:OS_ARCH= "windows-amd64"
         $Env:TKG_CUSTOM_IMAGE_REPOSITORY= "projects-stg.registry.vmware.com/tkg"
+    # - name: Generate certs
+    #   run: |
+
+    #     CERT_DIR=$(mktemp -d -t certs.XXXX)
+    #     Install-Module -Name OpenSSL -Scope AllUsers
+    #     echo "CERT_DIR=$CERT_DIR" >> $env:GITHUB_ENV
+    #     # Define certificate name
+    #     # Define certificate name
+
+    #     $Certname = "Tanzu"
+    #     # Define expiration
+    #     $YearsToExpire = "1"
+    #     Write-Host "Creating Certifcate $Certname" -ForegroundColor Green
+    #     # Create certificate
+    #     $Cert = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname $Certname -NotAfter (Get-Date).AddDays($YearsToExpire)
+    #     Write-Host "Exporting Certificate $Certname to $env:USERPROFILE\$Certname.pfx" -ForegroundColor Green
+    #     # Set password to export certificate
+    #     $pw = ConvertTo-SecureString -String "Pazzword" -Force -AsPlainText
+    #     # Get thumbprint
+    #     $thumbprint = $Cert.Thumbprint
+    #     # Export certificate
+    #     Export-PfxCertificate -cert cert:\localMachine\my\$thumbprint -FilePath $env:USERPROFILE\$Certname.pfx -Password $pw
+    #     pkcs12 -in $env:USERPROFILE\$Certname.pfx -out privateKey.key -nocerts -nodes
+    #     pkcs12 -in $env:USERPROFILE\$Certname.pfx -out certificate.pem -nokeys -clcerts
+    # - name: Setup local registry
+    #   shell: bash
+    #   run: |
         
+    #     set -o errexit
+    #     set -o nounset
+    #     set -o pipefail
+    #     # Create password file
+    #     REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
+    #     docker run \
+    #     --entrypoint htpasswd \
+    #     httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
+       
+    #     # Run a registry.
+    #     docker run -d \
+    #       --restart=always \
+    #       --name local-registry \
+    #       -v ${CERT_DIR}:/certs \
+    #       -p "5000:5000" \
+    #       registry:2
+    #     # Make the $REGISTRY_NAME -> local-registry
+    #     echo "$(hostname -I | cut -d' ' -f1) $REGISTRY_NAME" | sudo tee -a /etc/hosts
     - name: Install tanzu cli
       run: |
         $TANZU_VERSION = "v0.25.0"
@@ -393,7 +438,7 @@ jobs:
       run: |
         tar -xvf tanzu-apps-plugin.tar.gz
         $Env:PATH += ";C:\Program Files\tanzu"
-        tanzu plugin install apps --local ./${OS_ARCH} --version ${BUILD_VERSION:-v0.0.0-dev}
+        tanzu plugin install apps --local ./${OS_ARCH} --version v0.0.0-dev
     - name: Install kind
       run: |
         mkdir "C:\Program Files\kind"
