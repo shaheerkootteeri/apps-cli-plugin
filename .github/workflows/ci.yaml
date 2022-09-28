@@ -245,7 +245,7 @@ jobs:
         set -o pipefail
 
         tar -xvf tanzu-apps-plugin.tar.gz
-        tanzu plugin install apps --local ./${OS_ARCH} --version ${BUILD_VERSION:-v0.0.0-dev}
+        tanzu plugin install apps --local ./${OS_ARCH} --version v0.0.0-dev
     - name: Install kind
       run: |
         cd $(mktemp -d -t kind.XXXX)
