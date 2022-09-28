@@ -390,12 +390,7 @@ jobs:
       run: echo "BUILD_VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
       if: startsWith(github.ref, 'refs/tags/')
     - name: Install CLI
-      shell: bash
       run: |
-        set -o errexit
-        set -o nounset
-        set -o pipefail
- 
         tar -xvf tanzu-apps-plugin.tar.gz
         $Env:PATH += ";C:\Program Files\tanzu"
         tanzu plugin install apps --local ./${OS_ARCH} --version ${BUILD_VERSION:-v0.0.0-dev}
@@ -411,8 +406,7 @@ jobs:
         set -o errexit
         set -o nounset
         set -o pipefail
- 
-        $Env:PATH += ";C:\Program Files\kind"
+
         # KinD configuration.
         # create a cluster with the local registry enabled in containerd
         cat <<EOF | kind create cluster --config=-
@@ -469,11 +463,7 @@ jobs:
         echo "##[endgroup]"
       continue-on-error: false
     - name: Delete Gracefully
-      shell: bash
       run: |
-        set -o errexit
-        set -o nounset
-        set -o pipefail
         $Env:PATH += ";C:\Program Files\tanzu"
 
         echo "##[group]Delete workload"
