@@ -373,8 +373,8 @@ jobs:
         $Env:REGISTRY_NAME= "registry-local"
         $Env:REGISTRY_USERNAME= "ruser"
         $Env:REGISTRY_PASSWORD= "rpass"
-        $Env:OS_ARCH= windows-amd64
-        $Env:TKG_CUSTOM_IMAGE_REPOSITORY= projects-stg.registry.vmware.com/tkg
+        $Env:OS_ARCH= "windows-amd64"
+        $Env:TKG_CUSTOM_IMAGE_REPOSITORY= "projects-stg.registry.vmware.com/tkg"
     - name: Generate certs
       shell: bash
       run: |
@@ -385,8 +385,8 @@ jobs:
         $Env:REGISTRY_NAME= "registry-local"
         $Env:REGISTRY_USERNAME= "ruser"
         $Env:REGISTRY_PASSWORD= "rpass"
-        $Env:OS_ARCH= windows-amd64
-        $Env:TKG_CUSTOM_IMAGE_REPOSITORY= projects-stg.registry.vmware.com/tkg
+        $Env:OS_ARCH= "windows-amd64"
+        $Env:TKG_CUSTOM_IMAGE_REPOSITORY= "projects-stg.registry.vmware.com/tkg"
         set -o errexit
         set -o nounset
         set -o pipefail
