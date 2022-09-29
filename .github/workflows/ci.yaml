@@ -375,6 +375,23 @@ jobs:
         $Env:REGISTRY_PASSWORD= "rpass"
         $Env:OS_ARCH= "windows-amd64"
         $Env:TKG_CUSTOM_IMAGE_REPOSITORY= "projects-stg.registry.vmware.com/tkg"
+    - name: Install tanzu cli
+      run: |
+        $TANZU_VERSION = "v0.25.0"
+        mkdir "C:\Program Files\tanzu"
+        $Env:PATH += ";C:\Program Files\tanzu"
+        curl -Lo tanzu-framework-windows-amd64.zip https://github.com/vmware-tanzu/tanzu-framework/releases/download/$TANZU_VERSION/tanzu-framework-windows-amd64.zip
+        tar -xf tanzu-framework-windows-amd64.zip
+        cp "cli\core\$TANZU_VERSION\tanzu-core-windows_amd64.exe" "C:\Program Files\tanzu\tanzu.exe"
+        tanzu init
+    - name: Build Version
+      run: echo "BUILD_VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+      if: startsWith(github.ref, 'refs/tags/')
+    - name: Install CLI
+      run: |
+        tar -xvf tanzu-apps-plugin.tar.gz
+        $Env:PATH += ";C:\Program Files\tanzu"
+        tanzu plugin install apps --local .\windows-amd64 --version v0.0.0-dev
     - name: Generate certs
       run: |
         mkdir "\cert"  
@@ -412,7 +429,7 @@ jobs:
         REGISTRY_NAME="registry-local"
         REGISTRY_USERNAME="ruser"
         REGISTRY_PASSWORD="rpass"
-        docker pull mcr.microsoft.com/windows/nanoserver:1803-amd64
+        cd ../../c/windows
         docker run \
         --entrypoint htpasswd \
         httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
@@ -429,23 +446,6 @@ jobs:
           registry:2
         # Make the $REGISTRY_NAME -> local-registry
         echo "$(hostname -I | cut -d' ' -f1) $REGISTRY_NAME" | sudo tee -a /etc/hosts
-    - name: Install tanzu cli
-      run: |
-        $TANZU_VERSION = "v0.25.0"
-        mkdir "C:\Program Files\tanzu"
-        $Env:PATH += ";C:\Program Files\tanzu"
-        curl -Lo tanzu-framework-windows-amd64.zip https://github.com/vmware-tanzu/tanzu-framework/releases/download/$TANZU_VERSION/tanzu-framework-windows-amd64.zip
-        tar -xf tanzu-framework-windows-amd64.zip
-        cp "cli\core\$TANZU_VERSION\tanzu-core-windows_amd64.exe" "C:\Program Files\tanzu\tanzu.exe"
-        tanzu init
-    - name: Build Version
-      run: echo "BUILD_VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
-      if: startsWith(github.ref, 'refs/tags/')
-    - name: Install CLI
-      run: |
-        tar -xvf tanzu-apps-plugin.tar.gz
-        $Env:PATH += ";C:\Program Files\tanzu"
-        tanzu plugin install apps --local .\windows-amd64 --version v0.0.0-dev
     - name: Install kind
       run: |
         mkdir "C:\Program Files\kind"
