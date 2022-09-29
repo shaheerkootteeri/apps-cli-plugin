@@ -415,7 +415,10 @@ jobs:
         which docker
         pwd
         loc=pwd
-        cd ../../../../
+        cd ../../../
+        pwd
+        ls
+        cd c
         pwd
         ls
         c/Windows/system32/docker/docker/DockerCli.exe -SwitchLinuxEngine
