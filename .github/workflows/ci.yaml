@@ -414,7 +414,8 @@ jobs:
         REGISTRY_PASSWORD="rpass"
         which docker
         loc=pwd
-        cd /c/Windows/system32/docker/docker
+        cd /c/Windows/system32/docker
+        ls
         pwd
         ./DockerCli.exe -SwitchLinuxEngine
         cd -- $loc
