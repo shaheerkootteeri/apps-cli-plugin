@@ -449,7 +449,7 @@ jobs:
         mkdir "C:\Program Files\kind"
         $Env:PATH += ";C:\Program Files\kind"
         curl.exe -Lo kind-windows-amd64.exe https://kind.sigs.k8s.io/dl/v0.16.0/kind-windows-amd64
-        Move-Item .\kind-windows-amd64.exe c:\Program Files\kind\kind.exe
+        Move-Item .\kind-windows-amd64.exe "c:\Program Files\kind\kind.exe"
     - name: Create Cluster
       shell: bash
       run: |
