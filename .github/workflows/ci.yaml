@@ -379,7 +379,7 @@ jobs:
       run: |
         mkdir "\cert"  
         $CERT_DIR= "\cert" 
-        Install-Module -Name OpenSSL
+        Install-Module -Name OpenSSL -Scope CurrentUser -Force
         echo "CERT_DIR=$CERT_DIR" >> $env:GITHUB_ENV
         # Define certificate name
         # Define certificate name
