@@ -385,11 +385,9 @@ jobs:
         # Define certificate name
 
         $Certname = "Tanzu"
-        # Define expiration
-        $DaysToExpire = "1"
         Write-Host "Creating Certifcate $Certname" -ForegroundColor Green
         # Create certificate
-        $Cert = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname $Certname -NotAfter (Get-Date).AddDays($DaysToExpire)
+        $Cert = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname $Certname -NotAfter (Get-Date).AddDays(1)
         Write-Host "Exporting Certificate $Certname to $env:USERPROFILE\$Certname.pfx" -ForegroundColor Green
         # Set password to export certificate
         $pw = ConvertTo-SecureString -String "Pazzword" -Force -AsPlainText
@@ -415,7 +413,11 @@ jobs:
         REGISTRY_USERNAME="ruser"
         REGISTRY_PASSWORD="rpass"
         which docker
-        pwd   
+        loc=pwd
+        cd /c/Windows/system32/docker/docker
+        pwd
+        ./DockerCli.exe -SwitchLinuxEngine
+        cd -- $loc
         docker run \
         --entrypoint htpasswd \
         httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
@@ -440,7 +442,6 @@ jobs:
         curl -Lo tanzu-framework-windows-amd64.zip https://github.com/vmware-tanzu/tanzu-framework/releases/download/$TANZU_VERSION/tanzu-framework-windows-amd64.zip
         tar -xf tanzu-framework-windows-amd64.zip
         cp "cli\core\$TANZU_VERSION\tanzu-core-windows_amd64.exe" "C:\Program Files\tanzu\tanzu.exe"
-        env
         tanzu init
     - name: Build Version
       run: echo "BUILD_VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
@@ -463,6 +464,7 @@ jobs:
         set -o nounset
         set -o pipefail
 
+        $CERT_DIR= "\cert"
         # KinD configuration.
         # create a cluster with the local registry enabled in containerd
         cat <<EOF | kind create cluster --config=-
