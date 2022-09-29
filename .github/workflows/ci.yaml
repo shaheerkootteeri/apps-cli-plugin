@@ -375,65 +375,69 @@ jobs:
         $Env:REGISTRY_PASSWORD= "rpass"
         $Env:OS_ARCH= "windows-amd64"
         $Env:TKG_CUSTOM_IMAGE_REPOSITORY= "projects-stg.registry.vmware.com/tkg"
-    # - name: Generate certs
-    #   run: |
-    #     mkdir "\cert"  
-    #     $CERT_DIR= "\cert" 
-    #     # Install-Module -Name OpenSSL -Scope CurrentUser -Force
-    #     echo "CERT_DIR=$CERT_DIR" >> $env:GITHUB_ENV
-    #     # Define certificate name
-    #     # Define certificate name
+    - name: Generate certs
+      run: |
+        mkdir "\cert"  
+        $CERT_DIR= "\cert" 
+        # Install-Module -Name OpenSSL -Scope CurrentUser -Force
+        echo "CERT_DIR=$CERT_DIR" >> $env:GITHUB_ENV
+        # Define certificate name
+        # Define certificate name
 
-    #     $Certname = "Tanzu"
-    #     Write-Host "Creating Certifcate $Certname" -ForegroundColor Green
-    #     # Create certificate
-    #     $Cert = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname $Certname -NotAfter (Get-Date).AddDays(1)
-    #     Write-Host "Exporting Certificate $Certname to $env:USERPROFILE\$Certname.pfx" -ForegroundColor Green
-    #     # Set password to export certificate
-    #     $pw = ConvertTo-SecureString -String "Pazzword" -Force -AsPlainText
-    #     # Get thumbprint
-    #     $thumbprint = $Cert.Thumbprint
-    #     # Export certificate
-    #     Export-PfxCertificate -cert cert:\localMachine\my\$thumbprint -FilePath $CERT_DIR\$Certname.pfx -Password $pw
-    #     # pkcs12 -in $env:USERPROFILE\$Certname.pfx -out privateKey.key -nocerts -nodes
-    #     # pkcs12 -in $env:USERPROFILE\$Certname.pfx -out certificate.pem -nokeys -clcerts
-    #     # cp certificate.pem $CERT_DIR\server.pem
-    #     # cp privateKey.key $CERT_DIR\server-key.pem
+        $Certname = "Tanzu"
+        Write-Host "Creating Certifcate $Certname" -ForegroundColor Green
+        # Create certificate
+        $Cert = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname $Certname -NotAfter (Get-Date).AddDays(1)
+        Write-Host "Exporting Certificate $Certname to $env:USERPROFILE\$Certname.pfx" -ForegroundColor Green
+        # Set password to export certificate
+        $pw = ConvertTo-SecureString -String "Pazzword" -Force -AsPlainText
+        # Get thumbprint
+        $thumbprint = $Cert.Thumbprint
+        # Export certificate
+        Export-PfxCertificate -cert cert:\localMachine\my\$thumbprint -FilePath $CERT_DIR\$Certname.pfx -Password $pw
+        # pkcs12 -in $env:USERPROFILE\$Certname.pfx -out privateKey.key -nocerts -nodes
+        # pkcs12 -in $env:USERPROFILE\$Certname.pfx -out certificate.pem -nokeys -clcerts
+        # cp certificate.pem $CERT_DIR\server.pem
+        # cp privateKey.key $CERT_DIR\server-key.pem
 
-    # - name: Setup local registry
-    #   shell: bash
-    #   run: |
+    - name: Setup local registry
+      shell: bash
+      run: |
         
-    #     set -o errexit
-    #     set -o nounset
-    #     set -o pipefail
-    #     # Create password file
-    #     REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
-    #     REGISTRY_NAME="registry-local"
-    #     REGISTRY_USERNAME="ruser"
-    #     REGISTRY_PASSWORD="rpass"
-    #     which docker
-    #     pwd
-    #     loc=pwd
-    #     c/Windows/system32/docker/docker/DockerCli.exe -SwitchLinuxEngine
-    #     ls
-    #     pwd
-    #     docker run \
-    #     --entrypoint htpasswd \
-    #     httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
+        set -o errexit
+        set -o nounset
+        set -o pipefail
+        # Create password file
+        REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
+        REGISTRY_NAME="registry-local"
+        REGISTRY_USERNAME="ruser"
+        REGISTRY_PASSWORD="rpass"
+        which docker
+        pwd
+        loc=pwd
+        cd ../../../../c/Windows/system32/docker
+        ls
+        # c/Windows/system32/docker/docker/DockerCli.exe -SwitchLinuxEngine
+        ls
+        pwd
+        cd ../../../../
+        cd -- $loc
+        docker run \
+        --entrypoint htpasswd \
+        httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
        
-    #     # Run a registry.
-    #     docker run -d \
-    #       --restart=always \
-    #       --name local-registry \
-    #       -v ${CERT_DIR}:/certs \
-    #       -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
-    #       -e REGISTRY_HTTP_TLS_CERTIFICATE=/cert/Tanzu.pfx \
-    #       -e REGISTRY_HTTP_TLS_KEY=/certs/Tanzu.pfx \
-    #       -p "443:443" \
-    #       registry:2
-    #     # Make the $REGISTRY_NAME -> local-registry
-    #     echo "$(hostname -I | cut -d' ' -f1) $REGISTRY_NAME" | sudo tee -a /etc/hosts
+        # Run a registry.
+        docker run -d \
+          --restart=always \
+          --name local-registry \
+          -v ${CERT_DIR}:/certs \
+          -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
+          -e REGISTRY_HTTP_TLS_CERTIFICATE=/cert/Tanzu.pfx \
+          -e REGISTRY_HTTP_TLS_KEY=/certs/Tanzu.pfx \
+          -p "443:443" \
+          registry:2
+        # Make the $REGISTRY_NAME -> local-registry
+        echo "$(hostname -I | cut -d' ' -f1) $REGISTRY_NAME" | sudo tee -a /etc/hosts
     - name: Install tanzu cli
       run: |
         $TANZU_VERSION = "v0.25.0"
