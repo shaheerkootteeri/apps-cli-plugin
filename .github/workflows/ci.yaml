@@ -413,12 +413,11 @@ jobs:
         REGISTRY_USERNAME="ruser"
         REGISTRY_PASSWORD="rpass"
         which docker
+        pwd
         loc=pwd
-        cd /c/Windows/system32/docker
+        c/Windows/system32/docker/docker/DockerCli.exe -SwitchLinuxEngine
         ls
         pwd
-        ./DockerCli.exe -SwitchLinuxEngine
-        cd -- $loc
         docker run \
         --entrypoint htpasswd \
         httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
