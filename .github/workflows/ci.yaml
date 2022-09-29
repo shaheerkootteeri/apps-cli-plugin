@@ -401,6 +401,12 @@ jobs:
         # pkcs12 -in $env:USERPROFILE\$Certname.pfx -out certificate.pem -nokeys -clcerts
         # cp certificate.pem $CERT_DIR\server.pem
         # cp privateKey.key $CERT_DIR\server-key.pem
+    - name: Setup docker run linux containers 
+      run: |
+        $loc=pwd
+        cd "c:\Program Files\Docker\Docker"
+        .\DockerCli.exe -SwitchLinuxEngine
+        cd $loc
     - name: Setup local registry
       shell: bash
       run: |
@@ -415,7 +421,7 @@ jobs:
         REGISTRY_PASSWORD="rpass"
         mkdir -p /etc/docker/certs.d/local-registry/
         cp /cert/Tanzu.pfx /etc/docker/certs.d/local-registry/ca.pfx
-
+        which docker        
         docker run \
         --entrypoint htpasswd \
         httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
