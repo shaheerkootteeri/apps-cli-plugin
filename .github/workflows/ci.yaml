@@ -395,7 +395,6 @@ jobs:
         $thumbprint = $Cert.Thumbprint
         # Export certificate
         Export-PfxCertificate -cert cert:\localMachine\my\$thumbprint -FilePath $CERT_DIR\$Certname.pfx -Password $pw
-        pwd
         # pkcs12 -in $env:USERPROFILE\$Certname.pfx -out privateKey.key -nocerts -nodes
         # pkcs12 -in $env:USERPROFILE\$Certname.pfx -out certificate.pem -nokeys -clcerts
         # cp certificate.pem $CERT_DIR\server.pem
@@ -469,7 +468,7 @@ jobs:
         set -o nounset
         set -o pipefail
 
-        $CERT_DIR= "\cert"
+        CERT_DIR="d/cert"
         # KinD configuration.
         # create a cluster with the local registry enabled in containerd
         cat <<EOF | kind create cluster --config=-
