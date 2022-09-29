@@ -379,7 +379,7 @@ jobs:
       run: |
         mkdir "\cert"  
         $CERT_DIR= "\cert" 
-        Install-Module -Name OpenSSL -Scope AllUsers
+        Install-Module -Name OpenSSL
         echo "CERT_DIR=$CERT_DIR" >> $env:GITHUB_ENV
         # Define certificate name
         # Define certificate name
@@ -396,7 +396,7 @@ jobs:
         # Get thumbprint
         $thumbprint = $Cert.Thumbprint
         # Export certificate
-        Export-PfxCertificate -cert cert:\localMachine\my\$thumbprint -FilePath $env:USERPROFILE\$Certname.pfx -Password $pw
+        Export-PfxCertificate -cert cert:\localMachine\my\$thumbprint -FilePath $CERT_DIR\$Certname.pfx -Password $pw
         pkcs12 -in $env:USERPROFILE\$Certname.pfx -out privateKey.key -nocerts -nodes
         pkcs12 -in $env:USERPROFILE\$Certname.pfx -out certificate.pem -nokeys -clcerts
         cp certificate.pem $CERT_DIR\server.pem
