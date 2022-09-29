@@ -413,6 +413,9 @@ jobs:
         REGISTRY_NAME="registry-local"
         REGISTRY_USERNAME="ruser"
         REGISTRY_PASSWORD="rpass"
+        mkdir -p /etc/docker/certs.d/local-registry/
+        cp /cert/Tanzu.pfx /etc/docker/certs.d/local-registry/ca.pfx
+
         docker run \
         --entrypoint htpasswd \
         httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
