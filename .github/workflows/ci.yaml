@@ -420,9 +420,10 @@ jobs:
     - name: Set experimental as true
       run: |
         cat 'C:\ProgramData\Docker\Config\daemon.json'
-        # $a = Get-Content 'C:\ProgramData\Docker\Config\daemon.json' -raw | ConvertFrom-Json
-        # $a.experimental="true"
-        # $a | ConvertTo-Json -depth 32| set-content 'C:\ProgramData\Docker\Config\daemon.json'
+        $json = Get-Content 'C:\ProgramData\Docker\Config\daemon.json' | Out-String | ConvertFrom-Json
+        $json | Add-Member -Type NoteProperty -Name 'experimental' -Value 'true'
+        $json | ConvertTo-Json | set-content 'C:\ProgramData\Docker\Config\daemon.json'
+        cat 'C:\ProgramData\Docker\Config\daemon.json'
         restart-service *docker*
 
     - name: Setup local registry
