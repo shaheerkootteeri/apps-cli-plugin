@@ -419,9 +419,10 @@ jobs:
         # cp privateKey.key $CERT_DIR\server-key.pem
     - name: Set experimental as true
       run: |
-        $a = Get-Content 'C:\ProgramData\Docker\Config\daemon.json' -raw | ConvertFrom-Json
-        $a.experimental="true"
-        $a | ConvertTo-Json -depth 32| set-content 'C:\ProgramData\Docker\Config\daemon.json'
+        cat 'C:\ProgramData\Docker\Config\daemon.json'
+        # $a = Get-Content 'C:\ProgramData\Docker\Config\daemon.json' -raw | ConvertFrom-Json
+        # $a.experimental="true"
+        # $a | ConvertTo-Json -depth 32| set-content 'C:\ProgramData\Docker\Config\daemon.json'
         restart-service *docker*
 
     - name: Setup local registry
