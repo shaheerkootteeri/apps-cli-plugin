@@ -419,8 +419,10 @@ jobs:
     - name: check the deamon file
       run: |
         gcm docker
+        Get-ChildItem -Path C:\ -Include *.json -File -Recurse -ErrorAction SilentlyContinue
         pwd
         $loc=pwd
+
         cd c:\ProgramData%\docker\
         ls
         cd $loc
