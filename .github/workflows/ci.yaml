@@ -434,7 +434,7 @@ jobs:
         # docker info
         # docker version -f '{{.Server.Experimental}}'
         # sudo service docker restart
-        Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V All 
+
         # Run a registry.
         docker run -d \
           --restart=always \
