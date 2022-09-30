@@ -416,6 +416,15 @@ jobs:
         # pkcs12 -in $env:USERPROFILE\$Certname.pfx -out certificate.pem -nokeys -clcerts
         # cp certificate.pem $CERT_DIR\server.pem
         # cp privateKey.key $CERT_DIR\server-key.pem
+    - name: check the deamon file
+      run: |
+        gcm docker
+        pwd
+        $loc=pwd
+        cd c:\ProgramData%\docker\
+        ls
+        cd $loc
+        pwd
 
     - name: Setup local registry
       shell: bash
