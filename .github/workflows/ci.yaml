@@ -429,7 +429,9 @@ jobs:
         REGISTRY_NAME="registry-local"
         REGISTRY_USERNAME="ruser"
         REGISTRY_PASSWORD="rpass"
-        cd ../../c/windows
+        docker pull --platform linux php
+        docker run -it php
+       
         docker run \
         --entrypoint htpasswd \
         httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
