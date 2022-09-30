@@ -438,7 +438,7 @@ jobs:
         REGISTRY_NAME="registry-local"
         REGISTRY_USERNAME="ruser"
         REGISTRY_PASSWORD="rpass"
-       
+        cat /etc/docker/daemon.json
         docker run \
         --entrypoint htpasswd \
         httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
