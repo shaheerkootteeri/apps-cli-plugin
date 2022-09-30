@@ -416,17 +416,6 @@ jobs:
         # pkcs12 -in $env:USERPROFILE\$Certname.pfx -out certificate.pem -nokeys -clcerts
         # cp certificate.pem $CERT_DIR\server.pem
         # cp privateKey.key $CERT_DIR\server-key.pem
-    - name: check the deamon file
-      run: |
-        gcm docker
-        Get-ChildItem -Path C:\ -Include *.json -File -Recurse -ErrorAction SilentlyContinue
-        pwd
-        $loc=pwd
-
-        cd c:\ProgramData%\docker\
-        ls
-        cd $loc
-        pwd
 
     - name: Setup local registry
       shell: bash
@@ -443,7 +432,7 @@ jobs:
         # docker info
         # docker version -f '{{.Server.Experimental}}'
         # sudo service docker restart
-
+        Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V All 
         # Run a registry.
         docker run -d \
           --restart=always \
@@ -453,7 +442,7 @@ jobs:
           -e REGISTRY_HTTP_TLS_CERTIFICATE=/cert/tanzu.pfx \
           -e REGISTRY_HTTP_TLS_KEY=/certs/tanzu.pfx \
           -p "443:443" \
-          zoined/registry
+          registry
         # Make the $REGISTRY_NAME -> local-registry
         echo "$(hostname -I | cut -d' ' -f1) $REGISTRY_NAME" | sudo tee -a /etc/hosts
     - name: Install kind
