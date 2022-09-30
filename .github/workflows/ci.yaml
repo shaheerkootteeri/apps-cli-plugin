@@ -443,7 +443,7 @@ jobs:
           -e REGISTRY_HTTP_TLS_CERTIFICATE=/cert/Tanzu.pfx \
           -e REGISTRY_HTTP_TLS_KEY=/certs/Tanzu.pfx \
           -p "443:443" \
-          registry:2
+          zoined/registry
         # Make the $REGISTRY_NAME -> local-registry
         echo "$(hostname -I | cut -d' ' -f1) $REGISTRY_NAME" | sudo tee -a /etc/hosts
     - name: Install kind
