@@ -418,7 +418,7 @@ jobs:
         # cp privateKey.key $CERT_DIR\server-key.pem
     - name: deamon
       run: |
-        Get-ChildItem -Path C:\ -Include *deamon*.json -File -Recurse -ErrorAction SilentlyContinue
+        Get-ChildItem -Path C:\ -Include *daemon*.json -File -Recurse -ErrorAction SilentlyContinue
     - name: Setup local registry
       shell: bash
       run: |
