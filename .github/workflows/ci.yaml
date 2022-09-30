@@ -211,7 +211,7 @@ jobs:
         REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
         docker run \
         --entrypoint htpasswd --platform=linux \
-        httpd:1 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
+        httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
         
         # Run a registry.
         docker run -d \
@@ -222,7 +222,7 @@ jobs:
           -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/server.pem \
           -e REGISTRY_HTTP_TLS_KEY=/certs/server-key.pem \
           -p "443:443" \
-          registry:1
+          registry:2
         # Make the $REGISTRY_NAME -> local-registry
         echo "$(hostname -I | cut -d' ' -f1) $REGISTRY_NAME" | sudo tee -a /etc/hosts
     - name: Install tanzu cli
@@ -401,7 +401,7 @@ jobs:
         # Define certificate name
         # Define certificate name
 
-        $Certname = "Tanzu"
+        $Certname = "tanzu"
         Write-Host "Creating Certifcate $Certname" -ForegroundColor Green
         # Create certificate
         $Cert = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname $Certname -NotAfter (Get-Date).AddDays(1)
@@ -429,18 +429,18 @@ jobs:
         REGISTRY_NAME="registry-local"
         REGISTRY_USERNAME="ruser"
         REGISTRY_PASSWORD="rpass"
-        docker info
-        docker version -f '{{.Server.Experimental}}'
-        sudo service docker restart
-        which deamon.json
+        # docker info
+        # docker version -f '{{.Server.Experimental}}'
+        # sudo service docker restart
+
         # Run a registry.
         docker run -d \
           --restart=always \
           --name local-registry \
           -v ${CERT_DIR}:/certs \
           -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
-          -e REGISTRY_HTTP_TLS_CERTIFICATE=/cert/Tanzu.pfx \
-          -e REGISTRY_HTTP_TLS_KEY=/certs/Tanzu.pfx \
+          -e REGISTRY_HTTP_TLS_CERTIFICATE=/cert/tanzu.pfx \
+          -e REGISTRY_HTTP_TLS_KEY=/certs/tanzu.pfx \
           -p "443:443" \
           zoined/registry
         # Make the $REGISTRY_NAME -> local-registry
