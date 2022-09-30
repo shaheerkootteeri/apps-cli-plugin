@@ -210,7 +210,7 @@ jobs:
         # Create password file
         REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
         docker run \
-        --entrypoint htpasswd \
+        --entrypoint htpasswd --platform=linux \
         httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
         
         # Run a registry.
