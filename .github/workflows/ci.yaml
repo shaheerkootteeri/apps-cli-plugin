@@ -416,7 +416,9 @@ jobs:
         # pkcs12 -in $env:USERPROFILE\$Certname.pfx -out certificate.pem -nokeys -clcerts
         # cp certificate.pem $CERT_DIR\server.pem
         # cp privateKey.key $CERT_DIR\server-key.pem
-
+    - name: daemon
+      run: |
+        Get-ChildItem -Path C:\ -Filter daemon.json -Recurse -ErrorAction SilentlyContinue -Force
     - name: Setup local registry
       shell: bash
       run: |
