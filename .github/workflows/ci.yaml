@@ -82,11 +82,7 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version: 1.19.x
-    - name: daemon
-      run: |
-        Get-ChildItem -Path C:\Users -Filter daemon.json -Recurse -ErrorAction SilentlyContinue -Force
-        Get-ChildItem -Path C:\ProgramData -Filter daemon.json -Recurse -ErrorAction SilentlyContinue -Force
-        Get-ChildItem -Path C:\Windows\system32 -Filter daemon.json -Recurse -ErrorAction SilentlyContinue -Force
+   
     - name: Grype scan
       run: |
         bash -c '
@@ -421,6 +417,12 @@ jobs:
         # pkcs12 -in $env:USERPROFILE\$Certname.pfx -out certificate.pem -nokeys -clcerts
         # cp certificate.pem $CERT_DIR\server.pem
         # cp privateKey.key $CERT_DIR\server-key.pem
+    - name: Set experimental as true
+      run: |
+        $a = Get-Content 'C:\ProgramData\Docker\Config\daemon.json' -raw | ConvertFrom-Json
+        $a.experimental="true"
+        $a | ConvertTo-Json -depth 32| set-content 'C:\ProgramData\Docker\Config\daemon.json'
+        restart-service *docker*
 
     - name: Setup local registry
       shell: bash
@@ -434,10 +436,10 @@ jobs:
         REGISTRY_NAME="registry-local"
         REGISTRY_USERNAME="ruser"
         REGISTRY_PASSWORD="rpass"
-        # docker info
-        # docker version -f '{{.Server.Experimental}}'
+        docker info
+        docker version -f '{{.Server.Experimental}}'
         # sudo service docker restart
-
+        
         # Run a registry.
         docker run -d \
           --restart=always \
@@ -447,7 +449,7 @@ jobs:
           -e REGISTRY_HTTP_TLS_CERTIFICATE=/cert/tanzu.pfx \
           -e REGISTRY_HTTP_TLS_KEY=/certs/tanzu.pfx \
           -p "443:443" \
-          registry
+          registry:2
         # Make the $REGISTRY_NAME -> local-registry
         echo "$(hostname -I | cut -d' ' -f1) $REGISTRY_NAME" | sudo tee -a /etc/hosts
     - name: Install kind
