@@ -421,7 +421,7 @@ jobs:
         gcm docker
         pwd
         $loc=pwd
-        cd c:\windows\system32\docker
+        cd c:\windows\system32\
         ls
         cd $loc
         pwd
