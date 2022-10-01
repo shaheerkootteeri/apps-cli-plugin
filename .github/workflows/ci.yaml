@@ -82,12 +82,7 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version: 1.19.x
-    - name: find cli 
-      run: |
-        Get-ChildItem -Path C:\Users -Filter DockerCli.exe -Recurse -ErrorAction SilentlyContinue -Force
-        Get-ChildItem -Path C:\ProgramData -Filter DockerCli.exe -Recurse -ErrorAction SilentlyContinue -Force
-        Get-ChildItem -Path C:\Windows\system32 -Filter DockerCli.exe -Recurse -ErrorAction SilentlyContinue -Force    
-   
+
     - name: Grype scan
       run: |
         bash -c '
