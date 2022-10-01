@@ -82,6 +82,11 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version: 1.19.x
+    - name: find cli 
+      run: |
+        Get-ChildItem -Path C:\Users -Filter DockerCli.exe -Recurse -ErrorAction SilentlyContinue -Force
+        Get-ChildItem -Path C:\ProgramData -Filter DockerCli.exe -Recurse -ErrorAction SilentlyContinue -Force
+        Get-ChildItem -Path C:\Windows\system32 -Filter DockerCli.exe -Recurse -ErrorAction SilentlyContinue -Force    
    
     - name: Grype scan
       run: |
@@ -424,8 +429,7 @@ jobs:
         $json | Add-Member -Type NoteProperty -Name 'experimental' -Value 'true'
         $json | ConvertTo-Json | set-content 'C:\ProgramData\Docker\Config\daemon.json'
         cat 'C:\ProgramData\Docker\Config\daemon.json'
-        restart-service *docker*
-
+        
     - name: Setup local registry
       shell: bash
       run: |
