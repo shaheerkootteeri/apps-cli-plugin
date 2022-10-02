@@ -84,7 +84,11 @@ jobs:
         go-version: 1.19.x
     - name: daemon
       run: |
-        restart-service *docker*
+        cat 'C:\ProgramData\Docker\Config\daemon.json'
+        $json = Get-Content 'C:\ProgramData\Docker\Config\daemon.json' | Out-String | ConvertFrom-Json
+        $json | Add-Member -Type NoteProperty -Name 'experimental' -Value 'true'
+        $json | ConvertTo-Json | set-content 'C:\ProgramData\Docker\Config\daemon.json'
+        cat 'C:\ProgramData\Docker\Config\daemon.json'
     - name: Grype scan
       run: |
         bash -c '
