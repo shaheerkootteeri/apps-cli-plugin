@@ -82,14 +82,14 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version: 1.19.x
-    - name: daemon
-      run: |
-        cat 'C:\ProgramData\Docker\Config\daemon.json'
-        $json = Get-Content 'C:\ProgramData\Docker\Config\daemon.json' | Out-String | ConvertFrom-Json
-        $json | Add-Member -Type NoteProperty -Name 'experimental' -Value $true
-        $json | ConvertTo-Json | set-content 'C:\ProgramData\Docker\Config\daemon.json'
-        cat 'C:\ProgramData\Docker\Config\daemon.json'
-        restart-service *docker*
+    # - name: daemon
+    #   run: |
+    #     cat 'C:\ProgramData\Docker\Config\daemon.json'
+    #     $json = Get-Content 'C:\ProgramData\Docker\Config\daemon.json' | Out-String | ConvertFrom-Json
+    #     $json | Add-Member -Type NoteProperty -Name 'experimental' -Value $true
+    #     $json | ConvertTo-Json | set-content 'C:\ProgramData\Docker\Config\daemon.json'
+    #     cat 'C:\ProgramData\Docker\Config\daemon.json'
+    #     restart-service *docker*
     - name: Grype scan
       run: |
         bash -c '
@@ -424,13 +424,13 @@ jobs:
         # pkcs12 -in $env:USERPROFILE\$Certname.pfx -out certificate.pem -nokeys -clcerts
         # cp certificate.pem $CERT_DIR\server.pem
         # cp privateKey.key $CERT_DIR\server-key.pem
-    - name: Set experimental as true
-      run: |
-        cat 'C:\ProgramData\Docker\Config\daemon.json'
-        $json = Get-Content 'C:\ProgramData\Docker\Config\daemon.json' | Out-String | ConvertFrom-Json
-        $json | Add-Member -Type NoteProperty -Name 'experimental' -Value 'true'
-        $json | ConvertTo-Json | set-content 'C:\ProgramData\Docker\Config\daemon.json'
-        cat 'C:\ProgramData\Docker\Config\daemon.json'
+    # - name: Set experimental as true
+    #   run: |
+    #     cat 'C:\ProgramData\Docker\Config\daemon.json'
+    #     $json = Get-Content 'C:\ProgramData\Docker\Config\daemon.json' | Out-String | ConvertFrom-Json
+    #     $json | Add-Member -Type NoteProperty -Name 'experimental' -Value 'true'
+    #     $json | ConvertTo-Json | set-content 'C:\ProgramData\Docker\Config\daemon.json'
+    #     cat 'C:\ProgramData\Docker\Config\daemon.json'
         
     # - name: Setup local registry
     #   shell: bash
