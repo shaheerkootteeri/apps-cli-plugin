@@ -88,17 +88,17 @@ jobs:
     - name: Setup WSL
       uses: Vampire/setup-wsl@v1.3.1
       with:
-         distribution: Ubuntu-22.04
+         distribution: Ubuntu-18.04
     - name: Install tanzu cli
       run: |
-        sudo apt update -y
-        sudo apt upgrade -y
         TANZU_VERSION=$(cat TANZU_VERSION)
         mkdir -p $HOME/tanzu
         curl -Lo tanzu-framework.tar.gz https://github.com/vmware-tanzu/tanzu-framework/releases/download/${TANZU_VERSION}/tanzu-framework-linux-amd64.tar.gz
         tar -xzf tanzu-framework.tar.gz -C /root/tanzu
         sudo mv /root/tanzu/cli/core/${TANZU_VERSION}/tanzu-core-linux_amd64 /usr/local/bin/tanzu
         chmod +x /usr/local/bin/tanzu
+        export ALLOWED_REGISTRY=projects-stg.registry.vmware.com/tkg
+        tanzu plugin sync
         env
         tanzu init
     - name: Grype scan
