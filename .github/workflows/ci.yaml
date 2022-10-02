@@ -75,7 +75,7 @@ jobs:
     env:
       TKG_CUSTOM_IMAGE_REPOSITORY: projects-stg.registry.vmware.com/tkg
       TANZU_CLI_NO_INIT: true
-      TANZU_HOME: c:/Program\ Files/tanzu
+      TANZU_HOME: $HOME/tanzu
     runs-on: windows-latest
     defaults:
       run:
@@ -91,7 +91,9 @@ jobs:
          distribution: Ubuntu-22.04
     - name: Install tanzu cli
       run: |
+        $TANZU_HOME= $HOME/tanzu
         TANZU_VERSION=$(cat TANZU_VERSION)
+        $TANZU_VERSION
         mkdir -p ${TANZU_HOME}
         curl -Lo tanzu-framework.tar.gz https://github.com/vmware-tanzu/tanzu-framework/releases/download/${TANZU_VERSION}/tanzu-framework-linux-amd64.tar.gz
           tar -xzf tanzu-framework.tar.gz -C ${TANZU_HOME}
