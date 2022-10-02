@@ -89,6 +89,7 @@ jobs:
         $json | Add-Member -Type NoteProperty -Name 'experimental' -Value 'true'
         $json | ConvertTo-Json | set-content 'C:\ProgramData\Docker\Config\daemon.json'
         cat 'C:\ProgramData\Docker\Config\daemon.json'
+        restart-service *docker*
     - name: Grype scan
       run: |
         bash -c '
