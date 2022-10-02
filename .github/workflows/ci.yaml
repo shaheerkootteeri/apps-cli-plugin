@@ -82,14 +82,7 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version: 1.19.x
-    # - name: daemon
-    #   run: |
-    #     cat 'C:\ProgramData\Docker\Config\daemon.json'
-    #     $json = Get-Content 'C:\ProgramData\Docker\Config\daemon.json' | Out-String | ConvertFrom-Json
-    #     $json | Add-Member -Type NoteProperty -Name 'experimental' -Value $true
-    #     $json | ConvertTo-Json | set-content 'C:\ProgramData\Docker\Config\daemon.json'
-    #     cat 'C:\ProgramData\Docker\Config\daemon.json'
-    #     restart-service *docker*
+
     - name: Grype scan
       run: |
         bash -c '
@@ -424,42 +417,44 @@ jobs:
         # pkcs12 -in $env:USERPROFILE\$Certname.pfx -out certificate.pem -nokeys -clcerts
         # cp certificate.pem $CERT_DIR\server.pem
         # cp privateKey.key $CERT_DIR\server-key.pem
-    # - name: Set experimental as true
-    #   run: |
-    #     cat 'C:\ProgramData\Docker\Config\daemon.json'
-    #     $json = Get-Content 'C:\ProgramData\Docker\Config\daemon.json' | Out-String | ConvertFrom-Json
-    #     $json | Add-Member -Type NoteProperty -Name 'experimental' -Value 'true'
-    #     $json | ConvertTo-Json | set-content 'C:\ProgramData\Docker\Config\daemon.json'
-    #     cat 'C:\ProgramData\Docker\Config\daemon.json'
+    - name: set Experimental as true
+      run: |
+        cat 'C:\ProgramData\Docker\Config\daemon.json'
+        $json = Get-Content 'C:\ProgramData\Docker\Config\daemon.json' | Out-String | ConvertFrom-Json
+        $json | Add-Member -Type NoteProperty -Name 'experimental' -Value $true
+        $json | ConvertTo-Json | set-content 'C:\ProgramData\Docker\Config\daemon.json'
+        cat 'C:\ProgramData\Docker\Config\daemon.json'
+        restart-service *docker*
         
-    # - name: Setup local registry
-    #   shell: bash
-    #   run: |
-    #     docker version
-    #     set -o errexit
-    #     set -o nounset
-    #     set -o pipefail
-    #     # Create password file
-    #     REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
-    #     REGISTRY_NAME="registry-local"
-    #     REGISTRY_USERNAME="ruser"
-    #     REGISTRY_PASSWORD="rpass"
-    #     docker info
-    #     docker version -f '{{.Server.Experimental}}'
-    #     # sudo service docker restart
+    - name: Setup local registry
+      shell: bash
+      run: |
+        docker version
+        set -o errexit
+        set -o nounset
+        set -o pipefail
+        # Create password file
+        REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
+        REGISTRY_NAME="registry-local"
+        REGISTRY_USERNAME="ruser"
+        REGISTRY_PASSWORD="rpass"
+        docker info
+        docker version -f '{{.Server.Experimental}}'
+        # sudo service docker restart
         
-    #     # Run a registry.
-    #     docker run -d \
-    #       --restart=always \
-    #       --name local-registry \
-    #       -v ${CERT_DIR}:/certs \
-    #       -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
-    #       -e REGISTRY_HTTP_TLS_CERTIFICATE=/cert/tanzu.pfx \
-    #       -e REGISTRY_HTTP_TLS_KEY=/certs/tanzu.pfx \
-    #       -p "443:443" \
-    #       registry:2
-    #     # Make the $REGISTRY_NAME -> local-registry
-    #     echo "$(hostname -I | cut -d' ' -f1) $REGISTRY_NAME" | sudo tee -a /etc/hosts
+        # Run a registry.
+        docker run -d \
+          --restart=always \
+          --name local-registry \
+          -v ${CERT_DIR}:/certs \
+          -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
+          -e REGISTRY_HTTP_TLS_CERTIFICATE=/cert/tanzu.pfx \
+          -e REGISTRY_HTTP_TLS_KEY=/certs/tanzu.pfx \
+          -p "443:443" \
+          registry:2
+        # Make the $REGISTRY_NAME -> local-registry
+        echo "$(hostname -I | cut -d' ' -f1) $REGISTRY_NAME" | sudo tee -a /etc/hosts
+        
     - name: Install kind
       run: |
         mkdir "C:\Program Files\kind"
