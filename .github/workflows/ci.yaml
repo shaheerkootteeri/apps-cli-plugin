@@ -93,8 +93,6 @@ jobs:
       run: |
         TANZU_HOME= $HOME/tanzu
         TANZU_VERSION=$(cat TANZU_VERSION)
-        $TANZU_VERSION
-        $TANZU_HOME
         mkdir -p ${TANZU_HOME}
         curl -Lo tanzu-framework.tar.gz https://github.com/vmware-tanzu/tanzu-framework/releases/download/${TANZU_VERSION}/tanzu-framework-linux-amd64.tar.gz
           tar -xzf tanzu-framework.tar.gz -C ${TANZU_HOME}
