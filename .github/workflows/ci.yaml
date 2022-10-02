@@ -77,12 +77,28 @@ jobs:
       TANZU_CLI_NO_INIT: true
       TANZU_HOME: c:/Program\ Files/tanzu
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: wsl-bash {0}
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-go@v3
       with:
         go-version: 1.19.x
-
+    - name: Setup WSL
+      uses: Vampire/setup-wsl@v1.3.1
+      with:
+         distribution: Ubuntu-22.04
+    - name: Install tanzu cli
+      run: |
+        TANZU_VERSION=$(cat TANZU_VERSION)
+        mkdir -p ${TANZU_HOME}
+        curl -Lo tanzu-framework.tar.gz https://github.com/vmware-tanzu/tanzu-framework/releases/download/${TANZU_VERSION}/tanzu-framework-linux-amd64.tar.gz
+          tar -xzf tanzu-framework.tar.gz -C ${TANZU_HOME}
+          sudo mv ${TANZU_HOME}/cli/core/${TANZU_VERSION}/tanzu-core-linux_amd64 /usr/local/bin/tanzu
+          chmod +x /usr/local/bin/tanzu
+        env
+        tanzu init
     - name: Grype scan
       run: |
         bash -c '
