@@ -411,7 +411,7 @@ jobs:
         tar -xvf tanzu-apps-plugin.tar.gz
         # $Env:PATH += ";C:\Program Files\tanzu"
         export ALLOWED_REGISTRY=projects-stg.registry.vmware.com/tkg
-        tanzu plugin install apps --local ./windows-amd64 --version v0.0.0-dev        
+        tanzu plugin install apps --local ./linux-amd64 --version v0.0.0-dev        
         tanzu plugin sync
     # - name: Generate certs
     #   run: |
