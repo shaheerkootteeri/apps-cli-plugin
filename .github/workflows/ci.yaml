@@ -410,39 +410,94 @@ jobs:
       run: |
         tar -xvf tanzu-apps-plugin.tar.gz
         # $Env:PATH += ";C:\Program Files\tanzu"
-        tanzu plugin install apps --local .\windows-amd64 --version v0.0.0-dev
+        tanzu plugin install apps --local /windows-amd64 --version v0.0.0-dev
+    # - name: Generate certs
+    #   run: |
+    #     mkdir "\cert"  
+    #     $CERT_DIR= "\cert" 
+    #     # Install-Module -Name OpenSSL -Scope CurrentUser -Force
+    #     echo "CERT_DIR=$CERT_DIR" >> $env:GITHUB_ENV
+    #     # Define certificate name
+    #     # Define certificate name
+
+    #     $Certname = "tanzu"
+    #     Write-Host "Creating Certifcate $Certname" -ForegroundColor Green
+    #     # Create certificate
+    #     $Cert = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname $Certname -NotAfter (Get-Date).AddDays(1)
+    #     Write-Host "Exporting Certificate $Certname to $env:USERPROFILE\$Certname.pfx" -ForegroundColor Green
+    #     # Set password to export certificate
+    #     $pw = ConvertTo-SecureString -String "Pazzword" -Force -AsPlainText
+    #     # Get thumbprint
+    #     $thumbprint = $Cert.Thumbprint
+    #     # Export certificate
+    #     Export-PfxCertificate -cert cert:\localMachine\my\$thumbprint -FilePath $CERT_DIR\$Certname.pfx -Password $pw
+    #     # pkcs12 -in $env:USERPROFILE\$Certname.pfx -out privateKey.key -nocerts -nodes
+    #     # pkcs12 -in $env:USERPROFILE\$Certname.pfx -out certificate.pem -nokeys -clcerts
+    #     # cp certificate.pem $CERT_DIR\server.pem
+    #     # cp privateKey.key $CERT_DIR\server-key.pem
     - name: Generate certs
       run: |
-        mkdir "\cert"  
-        $CERT_DIR= "\cert" 
-        # Install-Module -Name OpenSSL -Scope CurrentUser -Force
-        echo "CERT_DIR=$CERT_DIR" >> $env:GITHUB_ENV
-        # Define certificate name
-        # Define certificate name
-
-        $Certname = "tanzu"
-        Write-Host "Creating Certifcate $Certname" -ForegroundColor Green
-        # Create certificate
-        $Cert = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname $Certname -NotAfter (Get-Date).AddDays(1)
-        Write-Host "Exporting Certificate $Certname to $env:USERPROFILE\$Certname.pfx" -ForegroundColor Green
-        # Set password to export certificate
-        $pw = ConvertTo-SecureString -String "Pazzword" -Force -AsPlainText
-        # Get thumbprint
-        $thumbprint = $Cert.Thumbprint
-        # Export certificate
-        Export-PfxCertificate -cert cert:\localMachine\my\$thumbprint -FilePath $CERT_DIR\$Certname.pfx -Password $pw
-        # pkcs12 -in $env:USERPROFILE\$Certname.pfx -out privateKey.key -nocerts -nodes
-        # pkcs12 -in $env:USERPROFILE\$Certname.pfx -out certificate.pem -nokeys -clcerts
-        # cp certificate.pem $CERT_DIR\server.pem
-        # cp privateKey.key $CERT_DIR\server-key.pem
-    - name: set Experimental as true
+        set -o errexit
+        set -o nounset
+        set -o pipefail
+        CERT_DIR=$(mktemp -d -t certs.XXXX)
+        echo "CERT_DIR=$CERT_DIR" >> $GITHUB_ENV
+        echo "##[group]Install cfssl"
+          go install github.com/cloudflare/cfssl/cmd/cfssl@v1.6.2
+          go install github.com/cloudflare/cfssl/cmd/cfssljson@v1.6.2
+        echo "##[endgroup]"
+        echo "##[group]Generate CA"
+          cfssl gencert -initca ./.github/tls/root-csr.json \
+            | cfssljson -bare ${CERT_DIR}/root-ca
+          cfssl gencert -ca ${CERT_DIR}/root-ca.pem -ca-key ${CERT_DIR}/root-ca-key.pem \
+            -config=".github/tls/config.json" \
+            -profile="intermediate" ./.github/tls/intermediate-csr.json \
+            | cfssljson -bare ${CERT_DIR}/signing-ca
+          cat ${CERT_DIR}/signing-ca.pem ${CERT_DIR}/root-ca.pem > ${CERT_DIR}/ca.pem
+        echo "##[endgroup]"
+        echo "##[group]Install CA"
+          # https://ubuntu.com/server/docs/security-trust-store
+          sudo apt-get install -y ca-certificates
+        echo "##[endgroup]"
+        echo "##[group]Generate cert"
+          cfssl gencert -ca ${CERT_DIR}/signing-ca.pem -ca-key ${CERT_DIR}/signing-ca-key.pem \
+            -config=".github/tls/config.json" \
+            -profile="server" \
+            -hostname="${REGISTRY_NAME},local-registry" \
+            .github/tls/server-csr.json \
+            | cfssljson -bare ${CERT_DIR}/server
+        echo "##[endgroup]"
+    - name: Setup local registry
       run: |
-        cat 'C:\ProgramData\Docker\Config\daemon.json'
-        $json = Get-Content 'C:\ProgramData\Docker\Config\daemon.json' | Out-String | ConvertFrom-Json
-        $json | Add-Member -Type NoteProperty -Name 'experimental' -Value $true
-        $json | ConvertTo-Json | set-content 'C:\ProgramData\Docker\Config\daemon.json'
-        cat 'C:\ProgramData\Docker\Config\daemon.json'
-        restart-service *docker*
+        set -o errexit
+        set -o nounset
+        set -o pipefail
+        # Create password file
+        REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
+        docker run \
+        --entrypoint htpasswd --platform=linux \
+        httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
+        
+        # Run a registry.
+        docker run -d \
+          --restart=always \
+          --name local-registry \
+          -v ${CERT_DIR}:/certs \
+          -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
+          -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/server.pem \
+          -e REGISTRY_HTTP_TLS_KEY=/certs/server-key.pem \
+          -p "443:443" \
+          registry:2
+        # Make the $REGISTRY_NAME -> local-registry
+        echo "$(hostname -I | cut -d' ' -f1) $REGISTRY_NAME" | sudo tee -a /etc/hosts
+    # - name: set Experimental as true
+    #   run: |
+    #     cat 'C:\ProgramData\Docker\Config\daemon.json'
+    #     $json = Get-Content 'C:\ProgramData\Docker\Config\daemon.json' | Out-String | ConvertFrom-Json
+    #     $json | Add-Member -Type NoteProperty -Name 'experimental' -Value $true
+    #     $json | ConvertTo-Json | set-content 'C:\ProgramData\Docker\Config\daemon.json'
+    #     cat 'C:\ProgramData\Docker\Config\daemon.json'
+    #     restart-service *docker*
         
     # - name: Setup local registry
     #   shell: bash
@@ -487,7 +542,7 @@ jobs:
         set -o pipefail
         docker version
 
-        CERT_DIR="d/cert"
+        # CERT_DIR="d/cert"
         # KinD configuration.
         # create a cluster with the local registry enabled in containerd
         cat <<EOF | kind create cluster --config=-
