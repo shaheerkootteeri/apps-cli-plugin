@@ -84,8 +84,7 @@ jobs:
         go-version: 1.19.x
     - name: daemon
       run: |
-        Get-ChildItem -Path C:\ProgramData -Filter windows-daemon.json -Recurse -ErrorAction SilentlyContinue -Force
-        Get-ChildItem -Path C:\Users\ -Filter windows-daemon.json -Recurse -ErrorAction SilentlyContinue -Force 
+        restart-service *docker*
     - name: Grype scan
       run: |
         bash -c '
