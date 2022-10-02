@@ -366,18 +366,18 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: tanzu-apps-plugin.tar.gz
-    - name: setup Env variables
-      run: |
-        echo "BUNDLE= registry.local/integration-test/hellojar:source" >> $env:GITHUB_ENV
-        $Env:TANZU_HOME = "C:\Program Files\tanzu"
-        $Env:PATH += ";C:\Program Files\tanzu"
-        $Env:TANZU_CLI_NO_INIT = "true"
-        $Env:BUNDLE = "registry.local/integration-test/hellojar:source"
-        $Env:REGISTRY_NAME= "registry-local"
-        $Env:REGISTRY_USERNAME= "ruser"
-        $Env:REGISTRY_PASSWORD= "rpass"
-        $Env:OS_ARCH= "windows-amd64"
-        $Env:TKG_CUSTOM_IMAGE_REPOSITORY= "projects-stg.registry.vmware.com/tkg"
+    # - name: setup Env variables
+    #   run: |
+    #     echo "BUNDLE= registry.local/integration-test/hellojar:source" >> $GITHUB_ENV
+    #     $Env:TANZU_HOME = "C:\Program Files\tanzu"
+    #     $Env:PATH += ";C:\Program Files\tanzu"
+    #     $Env:TANZU_CLI_NO_INIT = "true"
+    #     BUNDLE = "registry.local/integration-test/hellojar:source"
+    #     $Env:REGISTRY_NAME= "registry-local"
+    #     $Env:REGISTRY_USERNAME= "ruser"
+    #     $Env:REGISTRY_PASSWORD= "rpass"
+    #     $Env:OS_ARCH= "windows-amd64"
+    #     $Env:TKG_CUSTOM_IMAGE_REPOSITORY= "projects-stg.registry.vmware.com/tkg"
     - name: Setup WSL
       uses: Vampire/setup-wsl@v1.3.1
       with:
