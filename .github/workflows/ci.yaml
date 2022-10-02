@@ -410,7 +410,7 @@ jobs:
       run: |
         tar -xvf tanzu-apps-plugin.tar.gz
         # $Env:PATH += ";C:\Program Files\tanzu"
-        tanzu plugin install apps --local .\windows-amd64 --version v0.0.0-dev
+        tanzu plugin install apps --local ./windows-amd64 --version v0.0.0-dev
     # - name: Generate certs
     #   run: |
     #     mkdir "\cert"  
