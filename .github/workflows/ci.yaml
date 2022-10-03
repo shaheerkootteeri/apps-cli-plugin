@@ -90,8 +90,9 @@ jobs:
       shell: wsl-bash {0}
       run: |
         cd /mnt/c/windows/system32
-        wsl --list --verbose
-        docker version
+        ls -a
+        wsl.exe --list --verbose
+        docker.exe version
         cd -
         set -o errexit
         set -o nounset
