@@ -89,8 +89,10 @@ jobs:
     - name: Setup local registry
       shell: wsl-bash {0}
       run: |
-        C:\Windows\system32\wsl.exe --list --verbose
-        C:\Windows\system32\docker.exe version
+        cd /mnt/c/windows/system32
+        wsl --list --verbose
+        docker version
+        cd -
         set -o errexit
         set -o nounset
         set -o pipefail
