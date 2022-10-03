@@ -91,12 +91,12 @@ jobs:
       run: |
         sudo apt-get update -y
         sudo apt-get upgrade -y
-        sudo apt install docker.io
-        sudo cgroupfs-mount
-        sudo usermod -aG docker $USER
+        sudo apt install docker.io -y
+        sudo cgroupfs-mount -y
+        sudo usermod -aG docker $USER -y
         echo "export DOCKER_HOST='tcp://0.0.0.0:2375'" >> ~./bashrc
         source ~./bashrc
-        sudo service docker starts
+        sudo service docker starts -y
         docker version
         wsl.exe --set-version Ubuntu-18.04 2"
         /mnt/c/windows/system32/wsl.exe --list --verbose
