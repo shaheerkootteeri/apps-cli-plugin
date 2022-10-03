@@ -362,6 +362,10 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version: 1.19.x
+    - name: Setup WSL
+      uses: Vampire/setup-wsl@v1.3.1
+      with:
+         distribution: Ubuntu-18.04
     - name: Download plugin bundle
       uses: actions/download-artifact@v3
       with:
@@ -378,10 +382,6 @@ jobs:
     #     $Env:REGISTRY_PASSWORD= "rpass"
     #     $Env:OS_ARCH= "windows-amd64"
     #     $Env:TKG_CUSTOM_IMAGE_REPOSITORY= "projects-stg.registry.vmware.com/tkg"
-    - name: Setup WSL
-      uses: Vampire/setup-wsl@v1.3.1
-      with:
-         distribution: Ubuntu-18.04
     - name: Install tanzu cli
       run: |
         TANZU_VERSION=$(cat TANZU_VERSION)
@@ -411,7 +411,7 @@ jobs:
         set -o errexit
         set -o nounset
         set -o pipefail
-        pkg
+        pwd
         tar -xvf tanzu-apps-plugin.tar.gz
         pkg
         ls
