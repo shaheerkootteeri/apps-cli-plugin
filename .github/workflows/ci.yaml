@@ -457,7 +457,6 @@ jobs:
     #     # cp privateKey.key $CERT_DIR\server-key.pem
     - name: Generate certs
       shell: wsl-bash {0}
-      uses: Vampire/setup-wsl@v1.3.1
       run: |
         set -o errexit
         set -o nounset
@@ -610,7 +609,6 @@ jobs:
     #     EOF
     - name: Install kind
       shell: wsl-bash {0}
-      uses: Vampire/setup-wsl@v1.3.1
       run: |
         cd $(mktemp -d -t kind.XXXX)
         curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-$(go env GOHOSTOS)-$(go env GOHOSTARCH)
@@ -619,7 +617,6 @@ jobs:
         cd -
     - name: Create Cluster
       shell: wsl-bash {0}
-      uses: Vampire/setup-wsl@v1.3.1
       run: |
         set -o errexit
         set -o nounset
