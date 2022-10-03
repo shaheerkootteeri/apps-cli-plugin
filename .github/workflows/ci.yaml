@@ -83,7 +83,7 @@ jobs:
       with:
         go-version: 1.19.x
     - name: Setup WSL
-      uses: Vampire/setup-wsl@v2
+      uses: Vampire/setup-wsl@v1
       with:
          distribution: Ubuntu-18.04
     - name: Setup local registry
