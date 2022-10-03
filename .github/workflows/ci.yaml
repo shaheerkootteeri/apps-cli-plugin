@@ -385,7 +385,6 @@ jobs:
     - name: Install tanzu cli
       run: |
         TANZU_VERSION=$(cat TANZU_VERSION)
-        $TANZU_VERSION
         mkdir -p /root/tanzu
         curl -Lo tanzu-framework.tar.gz https://github.com/vmware-tanzu/tanzu-framework/releases/download/${TANZU_VERSION}/tanzu-framework-linux-amd64.tar.gz
           tar -xzf tanzu-framework.tar.gz -C /root/tanzu
@@ -420,7 +419,7 @@ jobs:
         cd linux-amd64
         tanzu plugin install apps --local . --version v0.0.0-dev
         cd --
-        
+
     # - name: Generate certs
     #   run: |
     #     mkdir "\cert"  
