@@ -89,9 +89,7 @@ jobs:
     - name: Setup local registry
       shell: wsl-bash {0}
       run: |
-        cd /usr/bin 
-        ls -a
-        cd -
+        wsl.exe --set-version Ubuntu-18.04 2"
         /mnt/c/windows/system32/wsl.exe --list --verbose
         /mnt/c/windows/system32/docker.exe version
         set -o errexit
