@@ -85,6 +85,7 @@ jobs:
     - name: Setup local registry
       shell: bash
       run: |
+        docker version
         set -o errexit
         set -o nounset
         set -o pipefail
