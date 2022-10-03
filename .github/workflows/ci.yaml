@@ -83,12 +83,15 @@ jobs:
       with:
         go-version: 1.19.x
     - name: Setup WSL
-      uses: Vampire/setup-wsl@v1.3.1
+      uses: Vampire/setup-wsl@v2
       with:
          distribution: Ubuntu-18.04
     - name: Setup local registry
       shell: wsl-bash {0}
       run: |
+        cd /usr/bin 
+        ls -a
+        cd -
         /mnt/c/windows/system32/wsl.exe --list --verbose
         /mnt/c/windows/system32/docker.exe version
         set -o errexit
