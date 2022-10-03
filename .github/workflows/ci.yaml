@@ -93,8 +93,10 @@ jobs:
         sudo apt-get upgrade -y
         sudo apt install docker.io -y
         sudo usermod -aG docker $USER && newgrp docker
-        echo "export DOCKER_HOST='tcp://0.0.0.0:2375'" >> ~./bashrc
-        source ~./bashrc
+        cat $HOME/.bashrc
+        cat ~/.bashrc
+        echo "export DOCKER_HOST='tcp://0.0.0.0:2375'" >> $HOME/.bashrc
+        source ~/.bashrc
         sudo service docker starts -y
         docker version
         wsl.exe --set-version Ubuntu-18.04 2"
