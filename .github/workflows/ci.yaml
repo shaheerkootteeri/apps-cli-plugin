@@ -82,10 +82,11 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version: 1.19.x
-    - name: Setup local registry
-      uses: Vampire/setup-wsl@v1
+    - name: Setup WSL
+      uses: Vampire/setup-wsl@v1.3.1
       with:
          distribution: Ubuntu-18.04
+    - name: Setup local registry
       shell: wsl-bash {0}
       run: |
         docker version
