@@ -82,6 +82,30 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version: 1.19.x
+    - name: Setup local registry
+      shell: bash
+      run: |
+        set -o errexit
+        set -o nounset
+        set -o pipefail
+        # Create password file
+        REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
+        docker run \
+        --entrypoint htpasswd --platform=linux \
+        httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
+        
+        # Run a registry.
+        docker run -d \
+          --restart=always \
+          --name local-registry \
+          # -v ${CERT_DIR}:/certs \
+          # -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
+          # -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/server.pem \
+          # -e REGISTRY_HTTP_TLS_KEY=/certs/server-key.pem \
+          -p "127.0.0.1:5001:5000" \
+          registry:2
+        # Make the $REGISTRY_NAME -> local-registry
+        echo "$(hostname -I | cut -d' ' -f1) $REGISTRY_NAME" | sudo tee -a /etc/hosts
     - name: Grype scan
       run: |
         bash -c '
@@ -123,11 +147,11 @@ jobs:
       run: |
         $Env:PATH += ";C:\Program Files\tanzu"
         make publish
-    - uses: actions/upload-artifact@v3
-      with:
-        name: tanzu-apps-plugin.tar.gz
-        path: tanzu-apps-plugin*.tar.gz
-        retention-days: 1
+    # - uses: actions/upload-artifact@v3
+    #   with:
+    #     name: tanzu-apps-plugin.tar.gz
+    #     path: tanzu-apps-plugin*.tar.gz
+    #     retention-days: 1
     - name: Install
       run: |
         $Env:PATH += ";C:\Program Files\tanzu"
@@ -351,9 +375,9 @@ jobs:
       TANZU_HOME: $HOME/tanzu
       OS_ARCH: windows-amd64
       TKG_CUSTOM_IMAGE_REPOSITORY: projects-stg.registry.vmware.com/tkg
-    defaults:
-      run:
-        shell: wsl-bash {0}
+    # defaults:
+    #   run:
+    #     shell: wsl-bash {0}
     steps:
     - uses: actions/checkout@v3
     - uses: vmware-tanzu/carvel-setup-action@v1
@@ -362,10 +386,10 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version: 1.19.x
-    - name: Setup WSL
-      uses: Vampire/setup-wsl@v1.3.1
-      with:
-         distribution: Ubuntu-18.04
+    # - name: Setup WSL
+    #   uses: Vampire/setup-wsl@v1.3.1
+    #   with:
+    #      distribution: Ubuntu-18.04
     - name: Download plugin bundle
       uses: actions/download-artifact@v3
       with:
@@ -382,18 +406,18 @@ jobs:
     #     $Env:REGISTRY_PASSWORD= "rpass"
     #     $Env:OS_ARCH= "windows-amd64"
     #     $Env:TKG_CUSTOM_IMAGE_REPOSITORY= "projects-stg.registry.vmware.com/tkg"
-    - name: Install tanzu cli
-      run: |
-        TANZU_VERSION=$(cat TANZU_VERSION)
-        mkdir -p /root/tanzu
-        curl -Lo tanzu-framework.tar.gz https://github.com/vmware-tanzu/tanzu-framework/releases/download/${TANZU_VERSION}/tanzu-framework-linux-amd64.tar.gz
-          tar -xzf tanzu-framework.tar.gz -C /root/tanzu
-          sudo mv $HOME/tanzu/cli/core/${TANZU_VERSION}/tanzu-core-linux_amd64 /usr/local/bin/tanzu
-          chmod +x /usr/local/bin/tanzu
-        env
-        export ALLOWED_REGISTRY=projects-stg.registry.vmware.com/tkg
-        tanzu init
-        tanzu plugin sync
+    # - name: Install tanzu cli
+    #   run: |
+    #     TANZU_VERSION=$(cat TANZU_VERSION)
+    #     mkdir -p /root/tanzu
+    #     curl -Lo tanzu-framework.tar.gz https://github.com/vmware-tanzu/tanzu-framework/releases/download/${TANZU_VERSION}/tanzu-framework-linux-amd64.tar.gz
+    #       tar -xzf tanzu-framework.tar.gz -C /root/tanzu
+    #       sudo mv $HOME/tanzu/cli/core/${TANZU_VERSION}/tanzu-core-linux_amd64 /usr/local/bin/tanzu
+    #       chmod +x /usr/local/bin/tanzu
+    #     env
+    #     export ALLOWED_REGISTRY=projects-stg.registry.vmware.com/tkg
+    #     tanzu init
+    #     tanzu plugin sync
     # - name: Install tanzu cli
     #   run: |
     #     $TANZU_VERSION = "v0.25.0"
@@ -403,22 +427,22 @@ jobs:
     #     tar -xf tanzu-framework-windows-amd64.zip
     #     cp "cli\core\$TANZU_VERSION\tanzu-core-windows_amd64.exe" "C:\Program Files\tanzu\tanzu.exe"
     #     tanzu init
-    - name: Build Version
-      run: echo "BUILD_VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
-      if: startsWith(github.ref, 'refs/tags/')
-    - name: Install CLI
-      run: |
-        set -o errexit
-        set -o nounset
-        set -o pipefail
-        pwd
-        tar -xvf tanzu-apps-plugin.tar.gz
-        pwd
-        ls
-        # $Env:PATH += ";C:\Program Files\tanzu"
-        cd linux-amd64
-        tanzu plugin install apps --local . --version v0.0.0-dev
-        cd --
+    # - name: Build Version
+    #   run: echo "BUILD_VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+    #   if: startsWith(github.ref, 'refs/tags/')
+    # - name: Install CLI
+    #   run: |
+    #     set -o errexit
+    #     set -o nounset
+    #     set -o pipefail
+    #     pwd
+    #     tar -xvf tanzu-apps-plugin.tar.gz
+    #     pwd
+    #     ls
+    #     # $Env:PATH += ";C:\Program Files\tanzu"
+    #     cd linux-amd64
+    #     tanzu plugin install apps --local . --version v0.0.0-dev
+    #     cd --
 
     # - name: Generate certs
     #   run: |
@@ -444,39 +468,40 @@ jobs:
     #     # pkcs12 -in $env:USERPROFILE\$Certname.pfx -out certificate.pem -nokeys -clcerts
     #     # cp certificate.pem $CERT_DIR\server.pem
     #     # cp privateKey.key $CERT_DIR\server-key.pem
-    - name: Generate certs
-      run: |
-        set -o errexit
-        set -o nounset
-        set -o pipefail
-        CERT_DIR=$(mktemp -d -t certs.XXXX)
-        echo "CERT_DIR=$CERT_DIR" >> $GITHUB_ENV
-        echo "##[group]Install cfssl"
-          go install github.com/cloudflare/cfssl/cmd/cfssl@v1.6.2
-          go install github.com/cloudflare/cfssl/cmd/cfssljson@v1.6.2
-        echo "##[endgroup]"
-        echo "##[group]Generate CA"
-          cfssl gencert -initca ./.github/tls/root-csr.json \
-            | cfssljson -bare ${CERT_DIR}/root-ca
-          cfssl gencert -ca ${CERT_DIR}/root-ca.pem -ca-key ${CERT_DIR}/root-ca-key.pem \
-            -config=".github/tls/config.json" \
-            -profile="intermediate" ./.github/tls/intermediate-csr.json \
-            | cfssljson -bare ${CERT_DIR}/signing-ca
-          cat ${CERT_DIR}/signing-ca.pem ${CERT_DIR}/root-ca.pem > ${CERT_DIR}/ca.pem
-        echo "##[endgroup]"
-        echo "##[group]Install CA"
-          # https://ubuntu.com/server/docs/security-trust-store
-          sudo apt-get install -y ca-certificates
-        echo "##[endgroup]"
-        echo "##[group]Generate cert"
-          cfssl gencert -ca ${CERT_DIR}/signing-ca.pem -ca-key ${CERT_DIR}/signing-ca-key.pem \
-            -config=".github/tls/config.json" \
-            -profile="server" \
-            -hostname="${REGISTRY_NAME},local-registry" \
-            .github/tls/server-csr.json \
-            | cfssljson -bare ${CERT_DIR}/server
-        echo "##[endgroup]"
+    # - name: Generate certs
+    #   run: |
+    #     set -o errexit
+    #     set -o nounset
+    #     set -o pipefail
+    #     CERT_DIR=$(mktemp -d -t certs.XXXX)
+    #     echo "CERT_DIR=$CERT_DIR" >> $GITHUB_ENV
+    #     echo "##[group]Install cfssl"
+    #       go install github.com/cloudflare/cfssl/cmd/cfssl@v1.6.2
+    #       go install github.com/cloudflare/cfssl/cmd/cfssljson@v1.6.2
+    #     echo "##[endgroup]"
+    #     echo "##[group]Generate CA"
+    #       cfssl gencert -initca ./.github/tls/root-csr.json \
+    #         | cfssljson -bare ${CERT_DIR}/root-ca
+    #       cfssl gencert -ca ${CERT_DIR}/root-ca.pem -ca-key ${CERT_DIR}/root-ca-key.pem \
+    #         -config=".github/tls/config.json" \
+    #         -profile="intermediate" ./.github/tls/intermediate-csr.json \
+    #         | cfssljson -bare ${CERT_DIR}/signing-ca
+    #       cat ${CERT_DIR}/signing-ca.pem ${CERT_DIR}/root-ca.pem > ${CERT_DIR}/ca.pem
+    #     echo "##[endgroup]"
+    #     echo "##[group]Install CA"
+    #       # https://ubuntu.com/server/docs/security-trust-store
+    #       sudo apt-get install -y ca-certificates
+    #     echo "##[endgroup]"
+    #     echo "##[group]Generate cert"
+    #       cfssl gencert -ca ${CERT_DIR}/signing-ca.pem -ca-key ${CERT_DIR}/signing-ca-key.pem \
+    #         -config=".github/tls/config.json" \
+    #         -profile="server" \
+    #         -hostname="${REGISTRY_NAME},local-registry" \
+    #         .github/tls/server-csr.json \
+    #         | cfssljson -bare ${CERT_DIR}/server
+    #     echo "##[endgroup]"
     - name: Setup local registry
+      shell: bash
       run: |
         set -o errexit
         set -o nounset
@@ -491,11 +516,11 @@ jobs:
         docker run -d \
           --restart=always \
           --name local-registry \
-          -v ${CERT_DIR}:/certs \
-          -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
-          -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/server.pem \
-          -e REGISTRY_HTTP_TLS_KEY=/certs/server-key.pem \
-          -p "443:443" \
+          # -v ${CERT_DIR}:/certs \
+          # -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
+          # -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/server.pem \
+          # -e REGISTRY_HTTP_TLS_KEY=/certs/server-key.pem \
+          -p "127.0.0.1:5001:5000" \
           registry:2
         # Make the $REGISTRY_NAME -> local-registry
         echo "$(hostname -I | cut -d' ' -f1) $REGISTRY_NAME" | sudo tee -a /etc/hosts
