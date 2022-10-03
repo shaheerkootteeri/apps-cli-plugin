@@ -93,15 +93,7 @@ jobs:
         REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
         
         # Run a registry.
-        docker run -d \
-          --restart=always \
-          --name local-registry \
-          # -v ${CERT_DIR}:/certs \
-          # -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
-          # -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/server.pem \
-          # -e REGISTRY_HTTP_TLS_KEY=/certs/server-key.pem \
-          -p "127.0.0.1:5001:5000" \
-          registry:2
+        docker run -d --restart=always --name local-registry  -p "127.0.0.1:5001:5000"  registry:2
         # Make the $REGISTRY_NAME -> local-registry
         echo "$(hostname -I | cut -d' ' -f1) $REGISTRY_NAME" | sudo tee -a /etc/hosts
     - name: Grype scan
