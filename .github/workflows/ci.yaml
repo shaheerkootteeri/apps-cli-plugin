@@ -134,7 +134,7 @@ jobs:
         sudo apt install gcc -y
         sudo apt-get update -y
         CERT_DIR=$(mktemp -d -t certs.XXXX)
-        # echo "CERT_DIR=$CERT_DIR" >> $GITHUB_ENV
+        echo "CERT_DIR=$CERT_DIR" >> $Env:GITHUB_ENV
         echo "##[group]Install cfssl"
           go install github.com/cloudflare/cfssl/cmd/cfssl@v1.6.2
           go install github.com/cloudflare/cfssl/cmd/cfssljson@v1.6.2
