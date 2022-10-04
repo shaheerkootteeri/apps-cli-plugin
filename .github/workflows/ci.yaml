@@ -110,8 +110,8 @@ jobs:
         set -o errexit
         set -o nounset
         set -o pipefail
-        export REGISTRY_NAME= registry.local
-        export BUNDLE= registry.local/integration-test/hellojar:source
+        export REGISTRY_NAME=registry.local
+        export BUNDLE=registry.local/integration-test/hellojar:source
         export GOROOT=/usr/local/go-1.19
         export GOPATH=$HOME/projects/go
         export GOBIN=$GOPATH/bin
