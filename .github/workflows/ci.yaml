@@ -129,7 +129,6 @@ jobs:
         export BUNDLE=registry.local/integration-test/hellojar:source
         # Create password file
         REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
-        wsl --set-version Ubuntu 2
         docker version 
         # docker run \
         # --entrypoint htpasswd \
