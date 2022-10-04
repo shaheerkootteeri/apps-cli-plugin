@@ -129,8 +129,9 @@ jobs:
         export BUNDLE=registry.local/integration-test/hellojar:source
         # Create password file
         REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
+        docker version 
         docker run \
-        --entrypoint htpasswd --platform=linux \
+        --entrypoint htpasswd \
         httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
         
         # Run a registry.
