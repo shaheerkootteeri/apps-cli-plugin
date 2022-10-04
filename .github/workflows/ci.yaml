@@ -117,7 +117,9 @@ jobs:
         export GOBIN=$GOPATH/bin
         export PATH=$PATH:$GOROOT/bin
         export PATH=$PATH:$HOME/projects/go/bin
+        sudo apt-get update -y
         sudo apt install gcc -y
+        sudo apt-get update -y
         CERT_DIR=$(mktemp -d -t certs.XXXX)
         # echo "CERT_DIR=$CERT_DIR" >> $GITHUB_ENV
         echo "##[group]Install cfssl"
@@ -136,7 +138,6 @@ jobs:
         echo "##[group]Install CA"
           # https://ubuntu.com/server/docs/security-trust-store
           sudo apt-get install -y ca-certificates
-          sudo apt-get update -y
         echo "##[endgroup]"
         echo "##[group]Generate cert"
           cfssl gencert -ca ${CERT_DIR}/signing-ca.pem -ca-key ${CERT_DIR}/signing-ca-key.pem \
