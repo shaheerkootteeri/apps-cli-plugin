@@ -104,49 +104,47 @@ jobs:
         echo 'export GOBIN=$GOPATH/bin' >> $HOME/.bashrc
         echo 'export PATH=$PATH:$GOROOT/bin' >> $HOME/.bashrc
         echo 'export PATH=$PATH:$HOME/projects/go/bin' >> $HOME/.bashrc
-    - name: Generate certs
+    - name: install docker
       shell: wsl-bash {0}
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install ca-certificates curl gnupg lsb-release -y
+        sudo mkdir -p /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        sudo apt-get update -y
+        sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
+        # sudo update-alternatives --config iptables
+        sudo service docker start
+        sudo service docker status
+    - name: Setup local registry
+      shell: bash
       run: |
         set -o errexit
         set -o nounset
         set -o pipefail
         export REGISTRY_NAME=registry.local
+        export REGISTRY_USERNAME=ruser
+        export REGISTRY_PASSWORD=rpass
         export BUNDLE=registry.local/integration-test/hellojar:source
-        export GOROOT=/usr/local/go-1.19
-        export GOPATH=$HOME/projects/go
-        export GOBIN=$GOPATH/bin
-        export PATH=$PATH:$GOROOT/bin
-        export PATH=$PATH:$HOME/projects/go/bin
-        sudo apt-get update -y
-        sudo apt install gcc -y
-        sudo apt-get update -y
-        CERT_DIR=$(mktemp -d -t certs.XXXX)
-        # echo "CERT_DIR=$CERT_DIR" >> $GITHUB_ENV
-        echo "##[group]Install cfssl"
-          go install github.com/cloudflare/cfssl/cmd/cfssl@v1.6.2
-          go install github.com/cloudflare/cfssl/cmd/cfssljson@v1.6.2
-        echo "##[endgroup]"
-        echo "##[group]Generate CA"
-          cfssl gencert -initca ./.github/tls/root-csr.json \
-            | cfssljson -bare ${CERT_DIR}/root-ca
-          cfssl gencert -ca ${CERT_DIR}/root-ca.pem -ca-key ${CERT_DIR}/root-ca-key.pem \
-            -config=".github/tls/config.json" \
-            -profile="intermediate" ./.github/tls/intermediate-csr.json \
-            | cfssljson -bare ${CERT_DIR}/signing-ca
-          cat ${CERT_DIR}/signing-ca.pem ${CERT_DIR}/root-ca.pem > ${CERT_DIR}/ca.pem
-        echo "##[endgroup]"
-        echo "##[group]Install CA"
-          # https://ubuntu.com/server/docs/security-trust-store
-          sudo apt-get install -y ca-certificates
-        echo "##[endgroup]"
-        echo "##[group]Generate cert"
-          cfssl gencert -ca ${CERT_DIR}/signing-ca.pem -ca-key ${CERT_DIR}/signing-ca-key.pem \
-            -config=".github/tls/config.json" \
-            -profile="server" \
-            -hostname="${REGISTRY_NAME},local-registry" \
-            .github/tls/server-csr.json \
-            | cfssljson -bare ${CERT_DIR}/server
-        echo "##[endgroup]"
+        # Create password file
+        REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
+        docker run \
+        --entrypoint htpasswd --platform=linux \
+        httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
+        
+        # Run a registry.
+        docker run -d \
+          --restart=always \
+          --name local-registry \
+          -v ${CERT_DIR}:/certs \
+          -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
+          -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/server.pem \
+          -e REGISTRY_HTTP_TLS_KEY=/certs/server-key.pem \
+          -p "443:443" \
+          registry:2
+        # Make the $REGISTRY_NAME -> local-registry
+        echo "$(hostname -I | cut -d' ' -f1) $REGISTRY_NAME" | sudo tee -a /etc/hosts
     - name: Grype scan
       run: |
         bash -c '
@@ -503,14 +501,40 @@ jobs:
     #     # pkcs12 -in $env:USERPROFILE\$Certname.pfx -out certificate.pem -nokeys -clcerts
     #     # cp certificate.pem $CERT_DIR\server.pem
     #     # cp privateKey.key $CERT_DIR\server-key.pem
+    - name: install go
+      shell: wsl-bash {0}
+      run: |
+        VERSION=1.19
+        OS=linux
+        ARCH=amd64
+
+        cd $HOME
+        wget https://storage.googleapis.com/golang/go$VERSION.$OS-$ARCH.tar.gz
+        tar -xvf go$VERSION.$OS-$ARCH.tar.gz
+        mv go go-$VERSION
+        sudo mv go-$VERSION /usr/local
+
+        echo 'export GOROOT=/usr/local/go-1.19' >> $HOME/.bashrc
+        echo 'export GOPATH=$HOME/projects/go' >> $HOME/.bashrc
+        echo 'export GOBIN=$GOPATH/bin' >> $HOME/.bashrc
+        echo 'export PATH=$PATH:$GOROOT/bin' >> $HOME/.bashrc
+        echo 'export PATH=$PATH:$HOME/projects/go/bin' >> $HOME/.bashrc
     - name: Generate certs
       shell: wsl-bash {0}
       run: |
         set -o errexit
         set -o nounset
         set -o pipefail
-        set REGISTRY_NAME: registry.local
-        set BUNDLE: registry.local/integration-test/hellojar:source
+        export REGISTRY_NAME=registry.local
+        export BUNDLE=registry.local/integration-test/hellojar:source
+        export GOROOT=/usr/local/go-1.19
+        export GOPATH=$HOME/projects/go
+        export GOBIN=$GOPATH/bin
+        export PATH=$PATH:$GOROOT/bin
+        export PATH=$PATH:$HOME/projects/go/bin
+        sudo apt-get update -y
+        sudo apt install gcc -y
+        sudo apt-get update -y
         CERT_DIR=$(mktemp -d -t certs.XXXX)
         # echo "CERT_DIR=$CERT_DIR" >> $GITHUB_ENV
         echo "##[group]Install cfssl"
@@ -557,10 +581,10 @@ jobs:
         set -o errexit
         set -o nounset
         set -o pipefail
-        set REGISTRY_NAME: registry.local
-        set REGISTRY_USERNAME: ruser
-        set REGISTRY_PASSWORD: rpass
-        set BUNDLE: registry.local/integration-test/hellojar:source
+        export REGISTRY_NAME=registry.local
+        export REGISTRY_USERNAME=ruser
+        export REGISTRY_PASSWORD=rpass
+        export BUNDLE=registry.local/integration-test/hellojar:source
         # Create password file
         REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
         docker run \
