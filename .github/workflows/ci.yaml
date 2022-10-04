@@ -117,6 +117,7 @@ jobs:
         export GOBIN=$GOPATH/bin
         export PATH=$PATH:$GOROOT/bin
         export PATH=$PATH:$HOME/projects/go/bin
+        sudo apt install gcc -y
         CERT_DIR=$(mktemp -d -t certs.XXXX)
         # echo "CERT_DIR=$CERT_DIR" >> $GITHUB_ENV
         echo "##[group]Install cfssl"
