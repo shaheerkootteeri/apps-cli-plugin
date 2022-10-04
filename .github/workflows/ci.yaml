@@ -86,7 +86,7 @@ jobs:
       uses: Vampire/setup-wsl@v1
       with:
          distribution: Ubuntu-20.04
-    - name: setup local registry
+    - name: setup docker
       shell: wsl-bash {0}
       run: |
         sudo apt-get update -y
@@ -100,7 +100,10 @@ jobs:
         sudo service docker start
         sudo service docker status
         docker version
-
+       
+    - name: setup docker
+      shell: wsl-bash {0}
+      run: |
         set -o errexit
         set -o nounset
         set -o pipefail
@@ -108,7 +111,7 @@ jobs:
         REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
         
         # Run a registry.
-        docker run -d --restart=always --name local-registry  -p "127.0.0.1:5001:5000"  registry:2
+        docker run -d --restart=always --name local-registry  -p "127.0.0.1:8080:80"  registry:2
         # Make the $REGISTRY_NAME -> local-registry
         echo "$(hostname -I | cut -d' ' -f1) $REGISTRY_NAME" | sudo tee -a /etc/hosts
     - name: Grype scan
@@ -441,7 +444,7 @@ jobs:
     - name: Setup WSL
       uses: Vampire/setup-wsl@v1.3.1
       with:
-         distribution: Ubuntu-18.04
+         distribution: Ubuntu-20.04
 
     # - name: Generate certs
     #   run: |
@@ -502,6 +505,19 @@ jobs:
             .github/tls/server-csr.json \
             | cfssljson -bare ${CERT_DIR}/server
         echo "##[endgroup]"
+    - name: install docker
+      shell: wsl-bash {0}
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install ca-certificates curl gnupg lsb-release -y
+        sudo mkdir -p /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        sudo apt-get update -y
+        sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
+        # sudo update-alternatives --config iptables
+        sudo service docker start
+        sudo service docker status
     - name: Setup local registry
       shell: bash
       run: |
