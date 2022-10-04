@@ -82,24 +82,25 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version: 1.19.x
-    - name: Setup WSL
+    - name: setup WSL
       uses: Vampire/setup-wsl@v1
       with:
          distribution: Ubuntu-18.04
-    - name: Setup local registry
+    - name: setup-docker
+      uses: docker-practice/actions-setup-docker@1.0.11
+    - name: setup local registry
       shell: wsl-bash {0}
       run: |
-        sudo apt update -y
-        sudo apt-get upgrade -y
-        # sudo apt install docker.io -y
-        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        docker version 
         sudo apt-get update -y
-        sudo apt-get install -y docker-ce
-        sudo usermod -aG docker $USER && newgrp docker
+        sudo apt-get upgrade -y
+        sudo apt-get remove docker docker-engine docker.io
+        sudo apt install docker.io -y    
+        # sudo usermod -aG docker $USER && newgrp docker
         # echo "export DOCKER_HOST='tcp://0.0.0.0:2375'" >> $HOME/.bashrc
         # source $HOME/.bashrc
         sudo service docker starts -y
+        sudo apt enable docker 
         docker version
         wsl.exe --set-version Ubuntu-18.04 2"
         /mnt/c/windows/system32/wsl.exe --list --verbose
