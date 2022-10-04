@@ -86,12 +86,9 @@ jobs:
       uses: Vampire/setup-wsl@v1
       with:
          distribution: Ubuntu-18.04
-    - name: setup-docker
-      uses: docker-practice/actions-setup-docker@1.0.11
     - name: setup local registry
       shell: wsl-bash {0}
       run: |
-        docker version 
         sudo apt-get update -y
         sudo apt-get upgrade -y
         sudo apt-get remove docker docker-engine docker.io
