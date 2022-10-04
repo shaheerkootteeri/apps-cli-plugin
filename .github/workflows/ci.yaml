@@ -85,7 +85,7 @@ jobs:
     - name: setup WSL
       uses: Vampire/setup-wsl@v1
       with:
-         distribution: Ubuntu-18.04
+         distribution: Ubuntu-22.04
     - name: setup local registry
       shell: wsl-bash {0}
       run: |
