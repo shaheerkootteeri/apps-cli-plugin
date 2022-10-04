@@ -118,7 +118,7 @@ jobs:
         sudo service docker start
         sudo service docker status
     - name: Setup local registry
-      shell: bash
+      shell: wsl-bash {0}
       run: |
         set -o errexit
         set -o nounset
