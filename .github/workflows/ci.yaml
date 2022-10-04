@@ -99,11 +99,11 @@ jobs:
         mv go go-$VERSION
         sudo mv go-$VERSION /usr/local
 
-        export GOROOT=/usr/local/go-1.19
-        export GOPATH=$HOME/projects/go
-        export GOBIN=$GOPATH/bin
-        export PATH=$PATH:$GOROOT/bin
-        export PATH=$PATH:$HOME/projects/go/bin
+        echo 'export GOROOT=/usr/local/go-1.19' >> $HOME/.bashrc
+        echo 'export GOPATH=$HOME/projects/go' >> $HOME/.bashrc
+        echo 'export GOBIN=$GOPATH/bin' >> $HOME/.bashrc
+        echo 'export PATH=$PATH:$GOROOT/bin' >> $HOME/.bashrc
+        echo 'export PATH=$PATH:$HOME/projects/go/bin' >> $HOME/.bashrc
     - name: Generate certs
       shell: wsl-bash {0}
       run: |
