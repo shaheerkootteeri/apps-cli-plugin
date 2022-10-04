@@ -118,6 +118,11 @@ jobs:
         sudo service docker start
         sudo service docker status
     - name: Generate certs
+      shell: bash
+      run: |
+        CERT_DIR=$(mktemp -d -t certs.XXXX)
+        echo "CERT_DIR=$CERT_DIR" >> $GITHUB_ENV
+    - name: Generate certs
       shell: wsl-bash {0}
       run: |
         set -o errexit
@@ -133,8 +138,7 @@ jobs:
         sudo apt-get update -y
         sudo apt install gcc -y
         sudo apt-get update -y
-        CERT_DIR=$(mktemp -d -t certs.XXXX)
-        echo "CERT_DIR=$CERT_DIR" >> $GITHUB_ENV
+        
         echo "##[group]Install cfssl"
           go install github.com/cloudflare/cfssl/cmd/cfssl@v1.6.2
           go install github.com/cloudflare/cfssl/cmd/cfssljson@v1.6.2
