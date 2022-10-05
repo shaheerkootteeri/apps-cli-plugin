@@ -82,16 +82,17 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version: 1.19.x
-    - name: Setup WSL
-      uses: Vampire/setup-wsl@v1.3.1
-      with:
-         distribution: Ubuntu-20.04
     - name: update wsl2
       shell: bash
       run: |
         /mnt/c/windows/system32/wsl.exe --list --verbose
         /mnt/c/windows/system32/wsl.exe --set-default-version 2
         /mnt/c/windows/system32/wsl.exe --list --verbose
+    - name: Setup WSL
+      uses: Vampire/setup-wsl@v1.3.1
+      with:
+         distribution: Ubuntu-20.04
+
     - name: install go
       shell: wsl-bash {0}
       run: |
