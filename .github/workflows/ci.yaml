@@ -134,9 +134,19 @@ jobs:
         sudo update-alternatives --config iptables
         sudo service docker start
         sudo service docker status
-         docker run \
-        --entrypoint htpasswd \
-        httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
+        #  docker run \
+        # --entrypoint htpasswd \
+        # httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
+         # Run a registry.
+        docker run -d \
+          --restart=always \
+          --name local-registry \
+          -v ${CERT_DIR}:/certs \
+          -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
+          -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/server.pem \
+          -e REGISTRY_HTTP_TLS_KEY=/certs/server-key.pem \
+          -p "443:443" \
+          registry:2
 
     - name: Generate certs
       shell: wsl-bash {0}
