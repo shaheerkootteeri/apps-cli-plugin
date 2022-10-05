@@ -123,7 +123,8 @@ jobs:
         set -o errexit
         set -o nounset
         set -o pipefail
-        CERT_DIR=$(mktemp -d -t certs.XXXX)
+        mkdir /tmp/certs.GeXc
+        CERT_DIR=/tmp/certs.GeXc
         echo $CERT_DIR
         # echo "CERT_DIR=$CERT_DIR" >> $GITHUB_ENV
         export REGISTRY_NAME=registry.local
@@ -172,6 +173,7 @@ jobs:
         export REGISTRY_USERNAME=ruser
         export REGISTRY_PASSWORD=rpass
         export BUNDLE=registry.local/integration-test/hellojar:source
+        CERT_DIR=/tmp/certs.GeXc
         # Create password file
         REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
         docker version 
