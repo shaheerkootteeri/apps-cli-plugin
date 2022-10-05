@@ -117,6 +117,10 @@ jobs:
         # sudo update-alternatives --config iptables
         sudo service docker start
         sudo service docker status
+         docker run \
+        --entrypoint htpasswd \
+        httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
+        
     - name: Generate certs
       shell: wsl-bash {0}
       run: |
