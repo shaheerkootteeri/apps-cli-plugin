@@ -94,8 +94,8 @@ jobs:
         Start-Process c:\wsl_update_x64.msi
         cd C:\Windows\system32
         wsl.exe --list --verbose
-        wsl.exe --update
-        wsl.exe --set-version Ubuntu 2
+        # wsl.exe --update
+        # wsl.exe --set-version Ubuntu 2
         # wsl.exe --set-default-version 2
         wsl.exe --list --verbose
         cd -
@@ -170,8 +170,8 @@ jobs:
         # sudo rm -rf /var/snap/docker/179/run/docker.pid
         # sudo service docker start
         # sudo cgroupfs-mount
-        sudo update-alternatives --set iptables /usr/sbin/iptables-legacy -y
-        sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy -y
+        sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
+        sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
         sudo service docker restart
         # sudo dockerd
         docker version
