@@ -86,6 +86,9 @@ jobs:
       uses: Vampire/setup-wsl@v1.3.1
       with:
          distribution: Ubuntu-20.04
+    - name: upgrade distro 
+      shell: bash
+      run: mnt/c/windows/system32/wsl.exe --set-version ubuntu 2
     - name: install go
       shell: wsl-bash {0}
       run: |
