@@ -89,6 +89,8 @@ jobs:
     - name: install go
       shell: wsl-bash {0}
       run: |
+        /mnt/c/windows/system32/wsl.exe --list --verbose
+        /mnt/c/windows/system32/wsl.exe --set-version ubuntu 2
         VERSION=1.19
         OS=linux
         ARCH=amd64
