@@ -169,6 +169,8 @@ jobs:
         # sudo rm -rf /var/snap/docker/179/run/docker.pid
         # sudo service docker start
         # sudo cgroupfs-mount
+        sudo update-alternatives --set iptables /usr/sbin/iptables-legacy -y
+        sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy -y
         sudo service docker restart
         # sudo dockerd
         docker version
