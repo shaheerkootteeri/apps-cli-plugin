@@ -107,6 +107,8 @@ jobs:
     - name: install docker
       shell: wsl-bash {0}
       run: |
+        export REGISTRY_NAME=registry.local
+        export BUNDLE=registry.local/integration-test/hellojar:source
         sudo apt-get update -y
         sudo apt-get install ca-certificates curl gnupg lsb-release -y
         sudo mkdir -p /etc/apt/keyrings
@@ -120,7 +122,7 @@ jobs:
          docker run \
         --entrypoint htpasswd \
         httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
-        
+
     - name: Generate certs
       shell: wsl-bash {0}
       run: |
