@@ -111,6 +111,7 @@ jobs:
         export REGISTRY_USERNAME=ruser
         export REGISTRY_PASSWORD=rpass
         export BUNDLE=registry.local/integration-test/hellojar:source
+        REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
         CERT_DIR=/tmp/certs.GeXc
         sudo apt-get update -y
         sudo apt-get install ca-certificates curl gnupg lsb-release -y
