@@ -129,6 +129,8 @@ jobs:
         REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
         CERT_DIR=/tmp/certs.GeXc
         sudo apt-get update -y
+        sudo rm -rf /var/lib/docker
+        sudo rm -rf /var/snap/docker/179/run/docker.pid
         sudo apt-get install ca-certificates curl gnupg lsb-release -y
         sudo apt-get install apt-transport-https ca-certificates curl software-properties-common -y
         sudo mkdir -p /etc/apt/keyrings
