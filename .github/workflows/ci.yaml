@@ -168,6 +168,8 @@ jobs:
         # sudo rm -rf /var/lib/docker
         # sudo rm -rf /var/snap/docker/179/run/docker.pid
         # sudo service docker start
+        sudo chmod 666 /var/run/docker.sock
+        sudo service docker restart
         sudo dockerd
         docker run -d -p 5000:5000 -v ${CERT_DIR}:/certs --restart=always --name hub.local registry:2
 
