@@ -144,25 +144,25 @@ jobs:
         # sudo update-alternatives --config iptables
         sudo iptables -t filter -F
         sudo iptables -t filter -X
-        # Authorize already established connections :
-        sudo iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
-        sudo iptables -A OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+        # # Authorize already established connections :
+        # sudo iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+        # sudo iptables -A OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
 
-        # Authorize backloop :
-        sudo iptables -t filter -A INPUT -i lo -j ACCEPT
-        sudo iptables -t filter -A OUTPUT -o lo -j ACCEPT
+        # # Authorize backloop :
+        # sudo iptables -t filter -A INPUT -i lo -j ACCEPT
+        # sudo iptables -t filter -A OUTPUT -o lo -j ACCEPT
 
-        # Authorize ssh :
-        sudo iptables -t filter -A INPUT -p tcp --dport 22 -j ACCEPT
-        sudo iptables -t filter -A OUTPUT -p tcp --dport 22 -j ACCEPT
+        # # Authorize ssh :
+        # sudo iptables -t filter -A INPUT -p tcp --dport 22 -j ACCEPT
+        # sudo iptables -t filter -A OUTPUT -p tcp --dport 22 -j ACCEPT
 
-        # Authorize HTTP :
-        sudo iptables -t filter -A INPUT -p tcp --dport 80 -j ACCEPT
-        sudo iptables -t filter -A OUTPUT -p tcp --dport 80 -j ACCEPT
+        # # Authorize HTTP :
+        # sudo iptables -t filter -A INPUT -p tcp --dport 80 -j ACCEPT
+        # sudo iptables -t filter -A OUTPUT -p tcp --dport 80 -j ACCEPT
 
-        # Authorize HTTPS :
-        sudo iptables -t filter -A INPUT -p tcp --dport 443 -j ACCEPT
-        sudo iptables -t filter -A OUTPUT -p tcp --dport 443 -j ACCEPT
+        # # Authorize HTTPS :
+        # sudo iptables -t filter -A INPUT -p tcp --dport 443 -j ACCEPT
+        # sudo iptables -t filter -A OUTPUT -p tcp --dport 443 -j ACCEPT
         sudo service docker restart
         sudo service docker status
         #  docker run \
