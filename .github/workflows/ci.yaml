@@ -174,9 +174,9 @@ jobs:
         # sudo cgroupfs-mount
         sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
         sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
-        sudo service unmask docker
-        sudo service unmask docker.service
-        sudo service unmask docker.socket
+        sudo /etc/init.d/ssh unmask docker
+        sudo /etc/init.d/ssh unmask docker.service
+        sudo /etc/init.d/ssh unmask docker.socket
         sudo /etc/init.d/docker restart
         sudo service docker restart
         # sudo dockerd
