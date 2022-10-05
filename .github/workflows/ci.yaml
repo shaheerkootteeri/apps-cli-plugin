@@ -118,16 +118,14 @@ jobs:
         sudo service docker start
         sudo service docker status
     - name: Generate certs
-      shell: bash
-      run: |
-        CERT_DIR=$(mktemp -d -t certs.XXXX)
-        echo "CERT_DIR=$CERT_DIR" >> $GITHUB_ENV
-    - name: Generate certs
       shell: wsl-bash {0}
       run: |
         set -o errexit
         set -o nounset
         set -o pipefail
+        CERT_DIR=$(mktemp -d -t certs.XXXX)
+        echo $CERT_DIR
+        # echo "CERT_DIR=$CERT_DIR" >> $GITHUB_ENV
         export REGISTRY_NAME=registry.local
         export BUNDLE=registry.local/integration-test/hellojar:source
         export GOROOT=/usr/local/go-1.19
