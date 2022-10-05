@@ -85,9 +85,11 @@ jobs:
     - name: update wsl2
       shell: bash
       run: |
-        /mnt/c/windows/system32/wsl.exe --list --verbose
-        /mnt/c/windows/system32/wsl.exe --set-default-version 2
-        /mnt/c/windows/system32/wsl.exe --list --verbose
+        cd C:\Windows\system32\
+        wsl.exe --list --verbose
+        wsl.exe --set-default-version 2
+        wsl.exe --list --verbose
+        cd -
     - name: Setup WSL
       uses: Vampire/setup-wsl@v1.3.1
       with:
