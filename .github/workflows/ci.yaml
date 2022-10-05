@@ -144,7 +144,7 @@ jobs:
         # sudo update-alternatives --config iptables
         sudo iptables -t filter -F
         sudo iptables -t filter -X
-        # # Authorize already established connections :
+        # Authorize already established connections :
         # sudo iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
         # sudo iptables -A OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
 
