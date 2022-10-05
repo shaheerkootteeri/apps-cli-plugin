@@ -108,7 +108,10 @@ jobs:
       shell: wsl-bash {0}
       run: |
         export REGISTRY_NAME=registry.local
+        export REGISTRY_USERNAME=ruser
+        export REGISTRY_PASSWORD=rpass
         export BUNDLE=registry.local/integration-test/hellojar:source
+        CERT_DIR=/tmp/certs.GeXc
         sudo apt-get update -y
         sudo apt-get install ca-certificates curl gnupg lsb-release -y
         sudo mkdir -p /etc/apt/keyrings
