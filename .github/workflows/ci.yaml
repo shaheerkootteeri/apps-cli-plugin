@@ -91,7 +91,9 @@ jobs:
         pwd
         systeminfo
         Invoke-WebRequest -Uri "https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi" -Outfile c:\wsl_update_x64.msi
-        Start-Process c:\wsl_update_x64.msi
+        CD c:\
+        Start-Process .\wsl_update_x64.msi
+        cd -
         cd C:\Windows\system32
         wsl.exe --list --verbose
         # wsl.exe --update
