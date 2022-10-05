@@ -142,7 +142,6 @@ jobs:
         # curl -fsSL https://get.docker.com -o get-docker.sh
         # sudo sh get-docker.sh
         # sudo update-alternatives --config iptables
-        sudo iptables -t filter -N DOCKER
         sudo iptables -t filter -F
         sudo iptables -t filter -X
         # Authorize already established connections :
