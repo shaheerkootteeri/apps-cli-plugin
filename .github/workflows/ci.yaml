@@ -89,6 +89,7 @@ jobs:
     - name: update wsl2
       run: |
         pwd
+        systeminfo
         cd C:\Windows\system32
         wsl.exe --list --verbose
         wsl.exe --set-version Ubuntu 2
