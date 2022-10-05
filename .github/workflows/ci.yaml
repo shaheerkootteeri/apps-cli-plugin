@@ -137,7 +137,7 @@ jobs:
         sudo apt-get update -y
         sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
         echo "export DOCKER_HOST=localhost:2375" >> ~/.bash_profile
-        sudo update-alternatives --config iptables
+        # sudo update-alternatives --config iptables
         # curl -fsSL https://get.docker.com -o get-docker.sh
         # DRY_RUN=1 sh ./get-docker.sh
         # curl -fsSL https://get.docker.com -o get-docker.sh
@@ -146,7 +146,7 @@ jobs:
         # sudo iptables -t filter -F
         # sudo iptables -t filter -X
 
-        sudo service docker restart
+        sudo service docker start
         sudo service docker status
         #  docker run \
         # --entrypoint htpasswd \
