@@ -92,7 +92,7 @@ jobs:
         systeminfo
         cd C:\Windows\system32
         wsl.exe --list --verbose
-        wsl.exe --set-version Ubuntu 2
+        # wsl.exe --set-version Ubuntu 2
         # wsl.exe --set-default-version 2
         wsl.exe --list --verbose
         cd -
@@ -139,6 +139,8 @@ jobs:
         # curl -fsSL https://get.docker.com -o get-docker.sh
         # sudo sh get-docker.sh
         # sudo update-alternatives --config iptables
+        sudo iptables -t filter -F
+        iptables -t filter -X
         sudo service docker start
         sudo service docker status
         #  docker run \
