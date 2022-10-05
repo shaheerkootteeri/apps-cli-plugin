@@ -176,10 +176,11 @@ jobs:
         CERT_DIR=/tmp/certs.GeXc
         # Create password file
         REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
+        sudo systemctl restart docker
         docker version 
-        # docker run \
-        # --entrypoint htpasswd \
-        # httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
+        docker run \
+        --entrypoint htpasswd \
+        httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
         
         # Run a registry.
         docker run -d \
@@ -191,6 +192,7 @@ jobs:
           -e REGISTRY_HTTP_TLS_KEY=/certs/server-key.pem \
           -p "443:443" \
           registry:2
+        sudo systemctl restart docker
         # Make the $REGISTRY_NAME -> local-registry
         echo "$(hostname -I | cut -d' ' -f1) $REGISTRY_NAME" | sudo tee -a /etc/hosts
     - name: Grype scan
