@@ -163,7 +163,7 @@ jobs:
         #   registry:2
         # sudo service docker start
         sudo rm /var/run/docker.pid
-        sudo service docker start
+        sudo service docker restart
         sudo dockerd
         docker run -d -p 5000:5000 -v ${CERT_DIR}:/certs --restart=always --name hub.local registry:2
 
