@@ -208,12 +208,8 @@ jobs:
         Move-Item .\kind-windows-amd64.exe "c:\Program Files\kind\kind.exe"
 
     - name: Create Cluster
-      shell: wsl-bash {0}
       run: |
-        set -o errexit
-        set -o nounset
-        set -o pipefail
-
+        $Env:PATH += ";C:\Program Files\kind"
         # KinD configuration.
         # create a cluster with the local registry enabled in containerd
         cat <<EOF | kind create cluster --config=-
