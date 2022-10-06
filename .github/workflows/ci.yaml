@@ -185,8 +185,8 @@ jobs:
         # sudo service docker restart
         # sudo dockerd
         docker version
-        iptables --wait -t nat -A DOCKER -p tcp -d 0/0 --dport 5000 -j DNAT --to-destination 172.17.0.2:5000 ! -i docker0
-        docker run -d -p 5000:5000 -v ${CERT_DIR}:/certs --restart=always --name hub.local registry:2
+        # iptables --wait -t nat -A DOCKER -p tcp -d 0/0 --dport 5000 -j DNAT --to-destination 172.17.0.2:5000 ! -i docker0
+        # docker run -d -p 5000:5000 -v ${CERT_DIR}:/certs --restart=always --name hub.local registry:2
     - name: Install kind
       shell: wsl-bash {0}
       run: |
@@ -195,49 +195,60 @@ jobs:
         chmod +x ./kind
         sudo mv ./kind /usr/local/bin
         cd -
-    - name: Create Cluster
-      shell: wsl-bash {0}
+    - name: install minikube
       run: |
-        set -o errexit
-        set -o nounset
-        set -o pipefail
+        New-Item -Path 'c:\' -Name 'minikube' -ItemType Directory -Force
+        Invoke-WebRequest -OutFile 'c:\minikube\minikube.exe' -Uri 'https://github.com/kubernetes/minikube/releases/latest/download/minikube-windows-amd64.exe' -UseBasicParsing
+        $oldPath = [Environment]::GetEnvironmentVariable('Path', [EnvironmentVariableTarget]::Machine)
+        if ($oldPath.Split(';') -inotcontains 'C:\minikube'){ `
+          [Environment]::SetEnvironmentVariable('Path', $('{0};C:\minikube' -f $oldPath), [EnvironmentVariableTarget]::Machine) `
+        }
+        minikube start
+        minikube kubectl -- get po -A
 
-        # KinD configuration.
-        # create a cluster with the local registry enabled in containerd
-        cat <<EOF | kind create cluster --config=-
-        kind: Cluster
-        apiVersion: kind.x-k8s.io/v1alpha4
-        containerdConfigPatches:
-        - |-
-          [plugins."io.containerd.grpc.v1.cri".registry.mirrors."${REGISTRY_NAME}"]
-            endpoint = ["https://local-registry"]
-        - |-
-          [plugins."io.containerd.grpc.v1.cri".registry.configs."local-registry".tls]
-            ca_file  = "/etc/docker/certs.d/local-registry/ca.pem"
-        nodes:
-        - role: control-plane
-          image: kindest/node:v${{ matrix.k8s }}
-          extraMounts:
-          - containerPath: /etc/docker/certs.d/local-registry
-            hostPath: ${CERT_DIR}
-        EOF
+    # - name: Create Cluster
+    #   shell: wsl-bash {0}
+    #   run: |
+    #     set -o errexit
+    #     set -o nounset
+    #     set -o pipefail
 
-        # connect the registry to the cluster network
-        docker network connect kind local-registry
+    #     # KinD configuration.
+    #     # create a cluster with the local registry enabled in containerd
+    #     cat <<EOF | kind create cluster --config=-
+    #     kind: Cluster
+    #     apiVersion: kind.x-k8s.io/v1alpha4
+    #     containerdConfigPatches:
+    #     - |-
+    #       [plugins."io.containerd.grpc.v1.cri".registry.mirrors."${REGISTRY_NAME}"]
+    #         endpoint = ["https://local-registry"]
+    #     - |-
+    #       [plugins."io.containerd.grpc.v1.cri".registry.configs."local-registry".tls]
+    #         ca_file  = "/etc/docker/certs.d/local-registry/ca.pem"
+    #     nodes:
+    #     - role: control-plane
+    #       image: kindest/node:v${{ matrix.k8s }}
+    #       extraMounts:
+    #       - containerPath: /etc/docker/certs.d/local-registry
+    #         hostPath: ${CERT_DIR}
+    #     EOF
 
-        # Document the local registry
-        # https://github.com/kubernetes/enhancements/tree/master/keps/sig-cluster-lifecycle/generic/1755-communicating-a-local-registry
-        cat <<EOF | kubectl apply -f -
-        apiVersion: v1
-        kind: ConfigMap
-        metadata:
-          name: local-registry-hosting
-          namespace: kube-public
-        data:
-          localRegistryHosting.v1: |
-            host: "localhost"
-            help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
-        EOF
+    #     # connect the registry to the cluster network
+    #     docker network connect kind local-registry
+
+    #     # Document the local registry
+    #     # https://github.com/kubernetes/enhancements/tree/master/keps/sig-cluster-lifecycle/generic/1755-communicating-a-local-registry
+    #     cat <<EOF | kubectl apply -f -
+    #     apiVersion: v1
+    #     kind: ConfigMap
+    #     metadata:
+    #       name: local-registry-hosting
+    #       namespace: kube-public
+    #     data:
+    #       localRegistryHosting.v1: |
+    #         host: "localhost"
+    #         help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
+    #     EOF
     - name: Generate certs
       shell: wsl-bash {0}
       run: |
