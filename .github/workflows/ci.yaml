@@ -132,13 +132,21 @@ jobs:
         REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
         CERT_DIR=/tmp/certs.GeXc
         sudo apt-get update -y
-        sudo rm -rf /var/lib/docker
-        sudo rm -rf /var/snap/docker/179/run/docker.pid
-        sudo apt-get install ca-certificates curl gnupg lsb-release -y
+        # sudo rm -rf /var/lib/docker
+        # sudo rm -rf /var/snap/docker/179/run/docker.pid
+        # sudo apt-get install ca-certificates curl gnupg lsb-release -y
         sudo apt-get install apt-transport-https ca-certificates curl software-properties-common -y
-        sudo mkdir -p /etc/apt/keyrings
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        # Download and add Docker's official public PGP key.
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        # Verify the fingerprint.
+        sudo apt-key fingerprint 0EBFCD88
+        sudo add-apt-repository \
+        "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+        $(lsb_release -cs) \
+        stable"
+        # sudo mkdir -p /etc/apt/keyrings
+        # curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        # echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
         sudo apt-get update -y
         sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
         # echo "export DOCKER_HOST=localhost:2375" >> ~/.bash_profile
@@ -147,7 +155,7 @@ jobs:
         # DRY_RUN=1 sh ./get-docker.sh
         # curl -fsSL https://get.docker.com -o get-docker.sh
         # sudo sh get-docker.sh
-        sudo update-alternatives --config iptables
+        # sudo update-alternatives --config iptables
         # sudo iptables -t filter -F
         # sudo iptables -t filter -X
         sudo usermod -aG docker $USER && newgrp docker
@@ -172,9 +180,9 @@ jobs:
         # sudo rm -rf /var/snap/docker/179/run/docker.pid
         # sudo service docker start
         # sudo cgroupfs-mount
-        sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
-        sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
-        sudo service docker restart
+        # sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
+        # sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+        # sudo service docker restart
         # sudo dockerd
         docker version
         docker run -d -p 5000:5000 -v ${CERT_DIR}:/certs --restart=always --name hub.local registry:2
