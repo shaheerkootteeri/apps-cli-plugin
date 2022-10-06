@@ -86,6 +86,9 @@ jobs:
       uses: Vampire/setup-wsl@v1.3.1
       with:
          distribution: Ubuntu-20.04
+    - name: Setup Minikube Kubernetes Cluster
+      uses: manusa/actions-setup-minikube@v2.7.0
+
     # - name: update wsl2
     #   run: |
     #     pwd
@@ -195,6 +198,8 @@ jobs:
     #     chmod +x ./kind
     #     sudo mv ./kind /usr/local/bin
     #     cd -
+    - name: Interact with the cluster
+      run: kubectl get nodes
     - name: Install kind
       run: |
         mkdir "C:\Program Files\kind"
