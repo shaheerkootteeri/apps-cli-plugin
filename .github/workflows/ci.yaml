@@ -86,107 +86,107 @@ jobs:
       uses: Vampire/setup-wsl@v1.3.1
       with:
          distribution: Ubuntu-20.04
-    - name: update wsl2
-      run: |
-        pwd
-        systeminfo
-        Invoke-WebRequest -Uri "https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi" -Outfile c:\wsl_update_x64.msi
-        CD c:\
-        Start-Process .\wsl_update_x64.msi
-        cd -
-        cd C:\Windows\system32
-        wsl.exe --list --verbose
-        wsl.exe --update
-        # wsl.exe --set-version Ubuntu 2
-        # wsl.exe --set-default-version 2
-        wsl.exe --list --verbose
-        cd -
-    - name: install go
-      shell: wsl-bash {0}
-      run: |
-        # /mnt/c/windows/system32/wsl.exe --list --verbose
-        # /mnt/c/windows/system32/wsl.exe --set-default-version 2
-        # /mnt/c/windows/system32/wsl.exe --set-version ubuntu 2
-        VERSION=1.19
-        OS=linux
-        ARCH=amd64
+    # - name: update wsl2
+    #   run: |
+    #     pwd
+    #     systeminfo
+    #     Invoke-WebRequest -Uri "https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi" -Outfile c:\wsl_update_x64.msi
+    #     CD c:\
+    #     Start-Process .\wsl_update_x64.msi
+    #     cd -
+    #     cd C:\Windows\system32
+    #     wsl.exe --list --verbose
+    #     wsl.exe --update
+    #     # wsl.exe --set-version Ubuntu 2
+    #     # wsl.exe --set-default-version 2
+    #     wsl.exe --list --verbose
+    #     cd -
+    # - name: install go
+    #   shell: wsl-bash {0}
+    #   run: |
+    #     # /mnt/c/windows/system32/wsl.exe --list --verbose
+    #     # /mnt/c/windows/system32/wsl.exe --set-default-version 2
+    #     # /mnt/c/windows/system32/wsl.exe --set-version ubuntu 2
+    #     VERSION=1.19
+    #     OS=linux
+    #     ARCH=amd64
 
-        cd $HOME
-        wget https://storage.googleapis.com/golang/go$VERSION.$OS-$ARCH.tar.gz
-        tar -xvf go$VERSION.$OS-$ARCH.tar.gz
-        mv go go-$VERSION
-        sudo mv go-$VERSION /usr/local
+    #     cd $HOME
+    #     wget https://storage.googleapis.com/golang/go$VERSION.$OS-$ARCH.tar.gz
+    #     tar -xvf go$VERSION.$OS-$ARCH.tar.gz
+    #     mv go go-$VERSION
+    #     sudo mv go-$VERSION /usr/local
 
-        echo 'export GOROOT=/usr/local/go-1.19' >> $HOME/.bashrc
-        echo 'export GOPATH=$HOME/projects/go' >> $HOME/.bashrc
-        echo 'export GOBIN=$GOPATH/bin' >> $HOME/.bashrc
-        echo 'export PATH=$PATH:$GOROOT/bin' >> $HOME/.bashrc
-        echo 'export PATH=$PATH:$HOME/projects/go/bin' >> $HOME/.bashrc
-    - name: install docker
-      shell: wsl-bash {0}
-      run: |
-        export REGISTRY_NAME=registry.local
-        export REGISTRY_USERNAME=ruser
-        export REGISTRY_PASSWORD=rpass
-        export BUNDLE=registry.local/integration-test/hellojar:source
-        REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
-        CERT_DIR=/tmp/certs.GeXc
-        sudo apt-get update -y
-        # sudo rm -rf /var/lib/docker
-        # sudo rm -rf /var/snap/docker/179/run/docker.pid
-        # sudo apt-get install ca-certificates curl gnupg lsb-release -y
-        sudo apt-get install apt-transport-https ca-certificates curl software-properties-common -y
-        # Download and add Docker's official public PGP key.
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-        # Verify the fingerprint.
-        sudo apt-key fingerprint 0EBFCD88
-        sudo add-apt-repository \
-        "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-        $(lsb_release -cs) \
-        stable"
-        # sudo mkdir -p /etc/apt/keyrings
-        # curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-        # echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-        sudo apt-get update -y
-        sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
-        # echo "export DOCKER_HOST=localhost:2375" >> ~/.bash_profile
-        # sudo update-alternatives --config iptables
-        # curl -fsSL https://get.docker.com -o get-docker.sh
-        # DRY_RUN=1 sh ./get-docker.sh
-        # curl -fsSL https://get.docker.com -o get-docker.sh
-        # sudo sh get-docker.sh
-        # sudo update-alternatives --config iptables
-        # sudo iptables -t filter -F
-        # sudo iptables -t filter -X
-        sudo usermod -aG docker $USER && newgrp docker
-        sudo service docker start
-        sudo service docker status
-        #  docker run \
-        # --entrypoint htpasswd \
-        # httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
-         # Run a registry.
-        # docker run -d \
-        #   --restart=always \
-        #   --name local-registry \
-        #   -v ${CERT_DIR}:/certs \
-        #   -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
-        #   -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/server.pem \
-        #   -e REGISTRY_HTTP_TLS_KEY=/certs/server-key.pem \
-        #   -p "443:443" \
-        #   registry:2
-        # sudo service docker start
-        # sudo service docker stop
-        # sudo rm -rf /var/lib/docker
-        # sudo rm -rf /var/snap/docker/179/run/docker.pid
-        # sudo service docker start
-        # sudo cgroupfs-mount
-        sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
-        sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
-        # sudo service docker restart
-        # sudo dockerd
-        docker version
-        # iptables --wait -t nat -A DOCKER -p tcp -d 0/0 --dport 5000 -j DNAT --to-destination 172.17.0.2:5000 ! -i docker0
-        # docker run -d -p 5000:5000 -v ${CERT_DIR}:/certs --restart=always --name hub.local registry:2
+    #     echo 'export GOROOT=/usr/local/go-1.19' >> $HOME/.bashrc
+    #     echo 'export GOPATH=$HOME/projects/go' >> $HOME/.bashrc
+    #     echo 'export GOBIN=$GOPATH/bin' >> $HOME/.bashrc
+    #     echo 'export PATH=$PATH:$GOROOT/bin' >> $HOME/.bashrc
+    #     echo 'export PATH=$PATH:$HOME/projects/go/bin' >> $HOME/.bashrc
+    # - name: install docker
+    #   shell: wsl-bash {0}
+    #   run: |
+    #     export REGISTRY_NAME=registry.local
+    #     export REGISTRY_USERNAME=ruser
+    #     export REGISTRY_PASSWORD=rpass
+    #     export BUNDLE=registry.local/integration-test/hellojar:source
+    #     REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
+    #     CERT_DIR=/tmp/certs.GeXc
+    #     sudo apt-get update -y
+    #     # sudo rm -rf /var/lib/docker
+    #     # sudo rm -rf /var/snap/docker/179/run/docker.pid
+    #     # sudo apt-get install ca-certificates curl gnupg lsb-release -y
+    #     sudo apt-get install apt-transport-https ca-certificates curl software-properties-common -y
+    #     # Download and add Docker's official public PGP key.
+    #     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    #     # Verify the fingerprint.
+    #     sudo apt-key fingerprint 0EBFCD88
+    #     sudo add-apt-repository \
+    #     "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+    #     $(lsb_release -cs) \
+    #     stable"
+    #     # sudo mkdir -p /etc/apt/keyrings
+    #     # curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    #     # echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    #     sudo apt-get update -y
+    #     sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
+    #     # echo "export DOCKER_HOST=localhost:2375" >> ~/.bash_profile
+    #     # sudo update-alternatives --config iptables
+    #     # curl -fsSL https://get.docker.com -o get-docker.sh
+    #     # DRY_RUN=1 sh ./get-docker.sh
+    #     # curl -fsSL https://get.docker.com -o get-docker.sh
+    #     # sudo sh get-docker.sh
+    #     # sudo update-alternatives --config iptables
+    #     # sudo iptables -t filter -F
+    #     # sudo iptables -t filter -X
+    #     sudo usermod -aG docker $USER && newgrp docker
+    #     sudo service docker start
+    #     sudo service docker status
+    #     #  docker run \
+    #     # --entrypoint htpasswd \
+    #     # httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
+    #      # Run a registry.
+    #     # docker run -d \
+    #     #   --restart=always \
+    #     #   --name local-registry \
+    #     #   -v ${CERT_DIR}:/certs \
+    #     #   -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
+    #     #   -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/server.pem \
+    #     #   -e REGISTRY_HTTP_TLS_KEY=/certs/server-key.pem \
+    #     #   -p "443:443" \
+    #     #   registry:2
+    #     # sudo service docker start
+    #     # sudo service docker stop
+    #     # sudo rm -rf /var/lib/docker
+    #     # sudo rm -rf /var/snap/docker/179/run/docker.pid
+    #     # sudo service docker start
+    #     # sudo cgroupfs-mount
+    #     sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
+    #     sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+    #     # sudo service docker restart
+    #     # sudo dockerd
+    #     docker version
+    #     # iptables --wait -t nat -A DOCKER -p tcp -d 0/0 --dport 5000 -j DNAT --to-destination 172.17.0.2:5000 ! -i docker0
+    #     # docker run -d -p 5000:5000 -v ${CERT_DIR}:/certs --restart=always --name hub.local registry:2
     # - name: Install kind
     #   shell: wsl-bash {0}
     #   run: |
@@ -201,16 +201,6 @@ jobs:
         $Env:PATH += ";C:\Program Files\kind"
         curl.exe -Lo kind-windows-amd64.exe https://kind.sigs.k8s.io/dl/v0.16.0/kind-windows-amd64
         Move-Item .\kind-windows-amd64.exe "c:\Program Files\kind\kind.exe"
-    - name: install minikube
-      run: |
-        New-Item -Path 'c:\' -Name 'minikube' -ItemType Directory -Force
-        Invoke-WebRequest -OutFile 'c:\minikube\minikube.exe' -Uri 'https://github.com/kubernetes/minikube/releases/latest/download/minikube-windows-amd64.exe' -UseBasicParsing
-        $oldPath = [Environment]::GetEnvironmentVariable('Path', [EnvironmentVariableTarget]::Machine)
-        if ($oldPath.Split(';') -inotcontains 'C:\minikube'){ `
-          [Environment]::SetEnvironmentVariable('Path', $('{0};C:\minikube' -f $oldPath), [EnvironmentVariableTarget]::Machine) `
-        }
-        minikube start
-        minikube kubectl -- get po -A
 
     - name: Create Cluster
       shell: wsl-bash {0}
@@ -242,84 +232,6 @@ jobs:
             host: "localhost"
             help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
         EOF
-    - name: Generate certs
-      shell: wsl-bash {0}
-      run: |
-        set -o errexit
-        set -o nounset
-        set -o pipefail
-        mkdir /tmp/certs.GeXc
-        CERT_DIR=/tmp/certs.GeXc
-        echo $CERT_DIR
-        # echo "CERT_DIR=$CERT_DIR" >> $GITHUB_ENV
-        export REGISTRY_NAME=registry.local
-        export BUNDLE=registry.local/integration-test/hellojar:source
-        export GOROOT=/usr/local/go-1.19
-        export GOPATH=$HOME/projects/go
-        export GOBIN=$GOPATH/bin
-        export PATH=$PATH:$GOROOT/bin
-        export PATH=$PATH:$HOME/projects/go/bin
-        sudo apt-get update -y
-        sudo apt install gcc -y
-        sudo apt-get update -y
-        
-        echo "##[group]Install cfssl"
-          go install github.com/cloudflare/cfssl/cmd/cfssl@v1.6.2
-          go install github.com/cloudflare/cfssl/cmd/cfssljson@v1.6.2
-        echo "##[endgroup]"
-        echo "##[group]Generate CA"
-          cfssl gencert -initca ./.github/tls/root-csr.json \
-            | cfssljson -bare ${CERT_DIR}/root-ca
-          cfssl gencert -ca ${CERT_DIR}/root-ca.pem -ca-key ${CERT_DIR}/root-ca-key.pem \
-            -config=".github/tls/config.json" \
-            -profile="intermediate" ./.github/tls/intermediate-csr.json \
-            | cfssljson -bare ${CERT_DIR}/signing-ca
-          cat ${CERT_DIR}/signing-ca.pem ${CERT_DIR}/root-ca.pem > ${CERT_DIR}/ca.pem
-        echo "##[endgroup]"
-        echo "##[group]Install CA"
-          # https://ubuntu.com/server/docs/security-trust-store
-          sudo apt-get install -y ca-certificates
-        echo "##[endgroup]"
-        echo "##[group]Generate cert"
-          cfssl gencert -ca ${CERT_DIR}/signing-ca.pem -ca-key ${CERT_DIR}/signing-ca-key.pem \
-            -config=".github/tls/config.json" \
-            -profile="server" \
-            -hostname="${REGISTRY_NAME},local-registry" \
-            .github/tls/server-csr.json \
-            | cfssljson -bare ${CERT_DIR}/server
-        echo "##[endgroup]"
-    - name: Setup local registry
-      shell: wsl-bash {0}
-      run: |
-        set -o errexit
-        set -o nounset
-        set -o pipefail
-        export REGISTRY_NAME=registry.local
-        export REGISTRY_USERNAME=ruser
-        export REGISTRY_PASSWORD=rpass
-        export BUNDLE=registry.local/integration-test/hellojar:source
-        CERT_DIR=/tmp/certs.GeXc
-        # Create password file
-        REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
-        sudo service docker restart
-        docker version 
-        docker run \
-        --entrypoint htpasswd \
-        httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
-        sudo service docker restart
-        # Run a registry.
-        docker run -d \
-          --restart=always \
-          --name local-registry \
-          -v ${CERT_DIR}:/certs \
-          -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
-          -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/server.pem \
-          -e REGISTRY_HTTP_TLS_KEY=/certs/server-key.pem \
-          -p "443:443" \
-          registry:2
-        sudo service docker restart
-        # Make the $REGISTRY_NAME -> local-registry
-        echo "$(hostname -I | cut -d' ' -f1) $REGISTRY_NAME" | sudo tee -a /etc/hosts
     - name: Grype scan
       run: |
         bash -c '
