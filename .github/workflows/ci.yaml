@@ -241,14 +241,7 @@ jobs:
           kubectl create namespace cartographer-system
           kapp deploy -y -a cartographer -n kube-system -f ./acceptance/vendor/cartographer/
         echo "##[endgroup]"
-    - name: Test CLI commands
-      run: |
-        $Env:PATH += ";C:\Program Files\tanzu"
-        $Env:PATH += ";C:\Program Files\kind"
-        echo "##[group]Integration Test"
-          make integration-test
-        echo "##[endgroup]"
-      continue-on-error: false
+
     - name: Grype scan
       run: |
         bash -c '
@@ -280,7 +273,14 @@ jobs:
         tanzu plugin install builder --local $TANZU_HOME/admin-plugins
         tanzu plugin install test --local $TANZU_HOME/admin-plugins
         tanzu plugin list
-
+    - name: Test CLI commands
+      run: |
+        $Env:PATH += ";C:\Program Files\tanzu"
+        $Env:PATH += ";C:\Program Files\kind"
+        echo "##[group]Integration Test"
+          make integration-test
+        echo "##[endgroup]"
+      continue-on-error: false
     - name: Test
       run: make test
     - name: Build Version
