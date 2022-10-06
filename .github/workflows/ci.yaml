@@ -187,14 +187,20 @@ jobs:
         docker version
         # iptables --wait -t nat -A DOCKER -p tcp -d 0/0 --dport 5000 -j DNAT --to-destination 172.17.0.2:5000 ! -i docker0
         # docker run -d -p 5000:5000 -v ${CERT_DIR}:/certs --restart=always --name hub.local registry:2
+    # - name: Install kind
+    #   shell: wsl-bash {0}
+    #   run: |
+    #     cd $(mktemp -d -t kind.XXXX)
+    #     curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-$(go env GOHOSTOS)-$(go env GOHOSTARCH)
+    #     chmod +x ./kind
+    #     sudo mv ./kind /usr/local/bin
+    #     cd -
     - name: Install kind
-      shell: wsl-bash {0}
       run: |
-        cd $(mktemp -d -t kind.XXXX)
-        curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-$(go env GOHOSTOS)-$(go env GOHOSTARCH)
-        chmod +x ./kind
-        sudo mv ./kind /usr/local/bin
-        cd -
+        mkdir "C:\Program Files\kind"
+        $Env:PATH += ";C:\Program Files\kind"
+        curl.exe -Lo kind-windows-amd64.exe https://kind.sigs.k8s.io/dl/v0.16.0/kind-windows-amd64
+        Move-Item .\kind-windows-amd64.exe "c:\Program Files\kind\kind.exe"
     - name: install minikube
       run: |
         New-Item -Path 'c:\' -Name 'minikube' -ItemType Directory -Force
@@ -206,49 +212,36 @@ jobs:
         minikube start
         minikube kubectl -- get po -A
 
-    # - name: Create Cluster
-    #   shell: wsl-bash {0}
-    #   run: |
-    #     set -o errexit
-    #     set -o nounset
-    #     set -o pipefail
+    - name: Create Cluster
+      shell: wsl-bash {0}
+      run: |
+        set -o errexit
+        set -o nounset
+        set -o pipefail
 
-    #     # KinD configuration.
-    #     # create a cluster with the local registry enabled in containerd
-    #     cat <<EOF | kind create cluster --config=-
-    #     kind: Cluster
-    #     apiVersion: kind.x-k8s.io/v1alpha4
-    #     containerdConfigPatches:
-    #     - |-
-    #       [plugins."io.containerd.grpc.v1.cri".registry.mirrors."${REGISTRY_NAME}"]
-    #         endpoint = ["https://local-registry"]
-    #     - |-
-    #       [plugins."io.containerd.grpc.v1.cri".registry.configs."local-registry".tls]
-    #         ca_file  = "/etc/docker/certs.d/local-registry/ca.pem"
-    #     nodes:
-    #     - role: control-plane
-    #       image: kindest/node:v${{ matrix.k8s }}
-    #       extraMounts:
-    #       - containerPath: /etc/docker/certs.d/local-registry
-    #         hostPath: ${CERT_DIR}
-    #     EOF
+        # KinD configuration.
+        # create a cluster with the local registry enabled in containerd
+        cat <<EOF | kind create cluster --config=-
+        kind: Cluster
+        apiVersion: kind.x-k8s.io/v1alpha4
+        EOF
 
-    #     # connect the registry to the cluster network
-    #     docker network connect kind local-registry
+        # connect the registry to the cluster network
+        docker network connect kind local-registry
 
-    #     # Document the local registry
-    #     # https://github.com/kubernetes/enhancements/tree/master/keps/sig-cluster-lifecycle/generic/1755-communicating-a-local-registry
-    #     cat <<EOF | kubectl apply -f -
-    #     apiVersion: v1
-    #     kind: ConfigMap
-    #     metadata:
-    #       name: local-registry-hosting
-    #       namespace: kube-public
-    #     data:
-    #       localRegistryHosting.v1: |
-    #         host: "localhost"
-    #         help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
-    #     EOF
+        # Document the local registry
+        # https://github.com/kubernetes/enhancements/tree/master/keps/sig-cluster-lifecycle/generic/1755-communicating-a-local-registry
+        cat <<EOF | kubectl apply -f -
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: local-registry-hosting
+          namespace: kube-public
+        data:
+          localRegistryHosting.v1: |
+            host: "localhost"
+            help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
+        EOF
     - name: Generate certs
       shell: wsl-bash {0}
       run: |
