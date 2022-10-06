@@ -241,8 +241,9 @@ jobs:
           [Environment]::SetEnvironmentVariable('Path', $('{0};C:\minikube' -f $oldPath), [EnvironmentVariableTarget]::Machine) `
         }
         $Env:PATH += ";C:\minikube"
-        Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-Tools -All
-        minikube start
+        Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All
+
+        minikube start --driver=hyperv -v=1 --alsologtostderr
     - name: Deploy Cartographer
       shell: bash
       run: |
