@@ -174,12 +174,10 @@ jobs:
         # sudo cgroupfs-mount
         sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
         sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
-        sudo snap connect docker:home docker:home
-        sudo snap start docker
         sudo service docker restart
         # sudo dockerd
         docker version
-        # docker run -d -p 5000:5000 -v ${CERT_DIR}:/certs --restart=always --name hub.local registry:2
+        docker run -d -p 5000:5000 -v ${CERT_DIR}:/certs --restart=always --name hub.local registry:2
     - name: Install kind
       shell: wsl-bash {0}
       run: |
