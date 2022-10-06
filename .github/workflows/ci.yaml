@@ -206,7 +206,7 @@ jobs:
     - name: Create Cluster
       run: |
         $Env:PATH += ";C:\Program Files\kind"
-           kind create cluster --name test_cluster
+           kind create cluster --name test-cluster
         # KinD configuration.
         # create a cluster with the local registry enabled in containerd
         # cat <<EOF | kind create cluster --config=-
