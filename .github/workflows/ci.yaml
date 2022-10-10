@@ -76,8 +76,6 @@ jobs:
     strategy:
       matrix:
         k8s:
-        - 1.21.10
-        - 1.22.7
         - 1.23.5
     env:
       REGISTRY_NAME: registry.local
@@ -200,6 +198,7 @@ jobs:
             host: "localhost"
             help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
         EOF
+        kubectl cluster-info 
     - name: Deploy Cartographer
       run: |
         set -o errexit
