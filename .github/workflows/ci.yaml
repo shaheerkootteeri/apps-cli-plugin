@@ -73,7 +73,28 @@ jobs:
 
   setupCluster:
     runs-on: ubuntu-latest
-    steps: 
+    env:
+      REGISTRY_NAME: registry.local
+      REGISTRY_USERNAME: ruser
+      REGISTRY_PASSWORD: rpass
+      BUNDLE: registry.local/integration-test/hellojar:source
+      TANZU_CLI_NO_INIT: true
+      TANZU_HOME: $HOME/tanzu
+      OS_ARCH: linux-amd64
+      TKG_CUSTOM_IMAGE_REPOSITORY: projects-stg.registry.vmware.com/tkg
+    steps:
+    - uses: actions/checkout@v3
+    - uses: vmware-tanzu/carvel-setup-action@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    - uses: actions/setup-go@v3
+      with:
+        go-version: 1.19.x
+    - name: Download plugin bundle
+      uses: actions/download-artifact@v3
+      with:
+        name: tanzu-apps-plugin.tar.gz
+        
     - name: Generate certs
       run: |
         set -o errexit
