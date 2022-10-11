@@ -200,13 +200,13 @@ jobs:
             help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
         EOF
         kubectl cluster-info 
-        ifconfig
+
         export ipaddress=$(ifconfig eth0 | grep "inet\b" | cut -d/ -f1 | awk '{ print $2}')
         echo $ipaddress
-        export ipaddress1=$(ifconfig eth0 | grep 'inet' | cut -d: -f2 | awk '{ print $1}')
-        echo $ipaddress1
+        export config=$(cat $HOME/.kube/config)
         
-        echo "::set-output name=ipaddress::${ipaddress}"
+        echo "::set-output name=ipaddress::$ipaddress"
+        echo "::set-output name=config::$config"
     - name: Deploy Cartographer
       run: |
         set -o errexit
@@ -219,6 +219,7 @@ jobs:
         echo "##[endgroup]"
     outputs:
       ipaddress: ${{ steps.cluster.outputs.ipaddress }}
+      config: ${{ steps.cluster.outputs.config }}
 
   unitwindows:
     env:
@@ -236,6 +237,7 @@ jobs:
     - name: output
       run: |
         echo ${{ needs.setupCluster.outputs.ipaddress }}
+        echo ${{ needs.setupCluster.outputs.config }}
     - name: Grype scan
       run: |
         bash -c '
