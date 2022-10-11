@@ -156,7 +156,7 @@ jobs:
         chmod +x ./kind
         sudo mv ./kind /usr/local/bin
         cd -
-    - name: Cluster
+    - name: cluster
       run: |
         set -o errexit
         set -o nounset
@@ -201,6 +201,8 @@ jobs:
         kubectl cluster-info 
         ifconfig
         export ipaddress=$(ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}')
+        echo $ipaddress
+        cat $HOME/.kube/config
     - name: Deploy Cartographer
       run: |
         set -o errexit
