@@ -235,7 +235,7 @@ jobs:
  
     - name: output
       run: |
-        echo "${{ needs.setupCluster.outputs.ipaddress }}"
+        echo ${{ needs.setupCluster.outputs.ipaddress }}
     - name: Grype scan
       run: |
         bash -c '
