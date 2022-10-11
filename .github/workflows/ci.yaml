@@ -264,7 +264,7 @@ jobs:
         "@
         echo $config
         New-Item "C:\Users\Public\config" -ItemType File -Value $config
-        type C:\Users\Public\.kube\config
+        type C:\Users\Public\config
     - name: Grype scan
       run: |
         bash -c '
@@ -329,15 +329,12 @@ jobs:
         $Env:PATH += ";C:\Program Files\tanzu"
         make install
     - name: Test CLI commands
-      shell: bash
       run: |
-        set -o errexit
-        set -o nounset
-        set -o pipefail
-
-        echo "##[group]Integration Test"
+          $Env:PATH += ";C:\Program Files\tanzu"
+          $env:KUBECONFIG
+          $env:KUBECONFIG = "C:\Users\Public\config"
+          $env:PATH
           make integration-test
-        echo "##[endgroup]"
       continue-on-error: false
     - name: Verify docs
       run: |
