@@ -200,7 +200,6 @@ jobs:
         EOF
         kubectl cluster-info 
         ifconfig
-        iwconfig
         export ipaddress=$(ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}')
         echo "::set-env name=ipaddress::$ipaddress"
     - name: Deploy Cartographer
