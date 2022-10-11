@@ -302,6 +302,7 @@ jobs:
         $Env:PATH += ";C:\Program Files\kind"
         $env:KUBECONFIG = "C:\Users\Public\config"
         $env:PATH
+        strace kubectl version
         kubectl config current-context
         echo "##[group]Integration Test"
           make integration-test
