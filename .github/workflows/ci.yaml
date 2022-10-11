@@ -156,7 +156,7 @@ jobs:
         chmod +x ./kind
         sudo mv ./kind /usr/local/bin
         cd -
-    - name: Create Cluster
+    - name: Cluster
       run: |
         set -o errexit
         set -o nounset
@@ -201,8 +201,8 @@ jobs:
         kubectl cluster-info 
         ifconfig
         iwconfig
-        export FOO=bar
-        echo "::set-env name=FOO::$FOO"
+        export ipaddress=$(ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}')
+        echo "::set-env name=ipaddress::$ipaddress"
     - name: Deploy Cartographer
       run: |
         set -o errexit
@@ -213,6 +213,8 @@ jobs:
           kubectl create namespace cartographer-system
           kapp deploy -y -a cartographer -n kube-system -f ./acceptance/vendor/cartographer/
         echo "##[endgroup]"
+    outputs:
+      ipaddress: ${{ steps.cluster.outputs.ipaddress }}
 
   unitwindows:
     env:
@@ -227,7 +229,9 @@ jobs:
       with:
         go-version: 1.19.x
  
-
+    - name: output
+      run: |
+        echo "${{ needs.setupCluster.outputs.ipaddress }}"
     - name: Grype scan
       run: |
         bash -c '
