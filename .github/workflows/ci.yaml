@@ -201,6 +201,8 @@ jobs:
         kubectl cluster-info 
         ifconfig
         iwconfig
+        export FOO=bar
+        echo "::set-env name=FOO::$FOO"
     - name: Deploy Cartographer
       run: |
         set -o errexit
@@ -239,6 +241,7 @@ jobs:
 
     - name: Install tanzu cli
       run: |
+        echo $FOO
         $TANZU_VERSION = "v0.25.0"
         mkdir "C:\Program Files\tanzu"       
         $Env:PATH += ";C:\Program Files\tanzu"
