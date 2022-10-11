@@ -203,7 +203,7 @@ jobs:
 
         export ipaddress=$(ifconfig eth0 | grep "inet\b" | cut -d/ -f1 | awk '{ print $2}')
         echo $ipaddress
-        export config=$(cat $HOME/.kube/config)
+        config=$( cat $HOME/.kube/config )
         echo $config
         echo "::set-output name=ipaddress::$ipaddress"
         echo "::set-output name=config::$config"
@@ -238,6 +238,7 @@ jobs:
       run: |
         echo ${{ needs.setupCluster.outputs.ipaddress }}
         echo ${{ needs.setupCluster.outputs.config }}
+        kubectl -v
     - name: Grype scan
       run: |
         bash -c '
