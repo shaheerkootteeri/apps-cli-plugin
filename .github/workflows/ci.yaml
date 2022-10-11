@@ -202,6 +202,7 @@ jobs:
         ifconfig
         export ipaddress=$(ifconfig eth0 | grep "inet\b" | cut -d/ -f1 | awk '{ print $2}')
         echo $ipaddress
+        ifconfig eth0 | grep 'inet' | cut -d: -f2 | awk '{ print $1}'
         cat $HOME/.kube/config
     - name: Deploy Cartographer
       run: |
