@@ -264,6 +264,9 @@ jobs:
         tanzu plugin install builder --local $TANZU_HOME/admin-plugins
         tanzu plugin install test --local $TANZU_HOME/admin-plugins
         tanzu plugin list
+        cd c:\Users
+        dir 
+        cd -
     - name: Test CLI commands
       run: |
         $Env:PATH += ";C:\Program Files\tanzu"
