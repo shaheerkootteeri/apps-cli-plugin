@@ -304,6 +304,8 @@ jobs:
         $env:PATH
         strace kubectl version
         kubectl config current-context
+        kubectl config view 
+        kubectl config --help
         echo "##[group]Integration Test"
           make integration-test
         echo "##[endgroup]"
