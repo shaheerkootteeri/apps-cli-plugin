@@ -238,6 +238,7 @@ jobs:
       run: |
         echo ${{ needs.setupCluster.outputs.ipaddress }}
         echo ${{ needs.setupCluster.outputs.config }}
+        ping ${{ needs.setupCluster.outputs.ipaddress }}
         $https="https://"
         $IP="${{ needs.setupCluster.outputs.ipaddress }}"
         $PORT=":33473"
@@ -302,10 +303,10 @@ jobs:
         $Env:PATH += ";C:\Program Files\kind"
         $env:KUBECONFIG = "C:\Users\Public\config"
         $env:PATH
-        strace kubectl version
-        kubectl config current-context
-        kubectl config view 
-        kubectl config --help
+        # strace kubectl version
+        # kubectl config current-context
+        # kubectl config view 
+        # kubectl config --help
         echo "##[group]Integration Test"
           make integration-test
         echo "##[endgroup]"
