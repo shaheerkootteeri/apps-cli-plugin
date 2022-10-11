@@ -264,7 +264,7 @@ jobs:
         tanzu plugin install builder --local $TANZU_HOME/admin-plugins
         tanzu plugin install test --local $TANZU_HOME/admin-plugins
         tanzu plugin list
-        cd c:\Users\runneradmin\
+        cd c:\Users\installer\
         dir 
         cd -
     - name: Test CLI commands
