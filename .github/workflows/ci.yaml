@@ -296,16 +296,15 @@ jobs:
         tanzu plugin install builder --local $TANZU_HOME/admin-plugins
         tanzu plugin install test --local $TANZU_HOME/admin-plugins
         tanzu plugin list
-        cd c:\Users\Public\
-        dir 
-        cd -
-        cd c:\windows\system32\
-        dir 
-        cd -
     - name: Test CLI commands
       run: |
         $Env:PATH += ";C:\Program Files\tanzu"
         $Env:PATH += ";C:\Program Files\kind"
+        $Env:PATH += ";C:\Program Files\tanzu"
+        $env:KUBECONFIG
+        $env:KUBECONFIG = "C:\Users\Public\config"
+        $env:PATH
+        kubectl config current-context
         echo "##[group]Integration Test"
           make integration-test
         echo "##[endgroup]"
@@ -328,14 +327,6 @@ jobs:
       run: |
         $Env:PATH += ";C:\Program Files\tanzu"
         make install
-    - name: Test CLI commands
-      run: |
-          $Env:PATH += ";C:\Program Files\tanzu"
-          $env:KUBECONFIG
-          $env:KUBECONFIG = "C:\Users\Public\config"
-          $env:PATH
-          make integration-test
-      continue-on-error: false
     - name: Verify docs
       run: |
         $Env:PATH += ";C:\Program Files\tanzu"
