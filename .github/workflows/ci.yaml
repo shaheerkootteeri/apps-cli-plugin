@@ -201,7 +201,6 @@ jobs:
         kubectl cluster-info 
         ifconfig
         export ipaddress=$(ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}')
-        echo "::set-env name=ipaddress::$ipaddress"
     - name: Deploy Cartographer
       run: |
         set -o errexit
