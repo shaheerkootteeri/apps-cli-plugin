@@ -156,7 +156,8 @@ jobs:
         chmod +x ./kind
         sudo mv ./kind /usr/local/bin
         cd -
-    - name: cluster
+    - name: create cluster
+      id: cluster
       run: |
         set -o errexit
         set -o nounset
@@ -202,8 +203,10 @@ jobs:
         ifconfig
         export ipaddress=$(ifconfig eth0 | grep "inet\b" | cut -d/ -f1 | awk '{ print $2}')
         echo $ipaddress
-        ifconfig eth0 | grep 'inet' | cut -d: -f2 | awk '{ print $1}'
-        cat $HOME/.kube/config
+        export ipaddress1=$(ifconfig eth0 | grep 'inet' | cut -d: -f2 | awk '{ print $1}')
+        echo $ipaddress1
+        
+        echo "::set-output name=ipaddress::${ipaddress}"
     - name: Deploy Cartographer
       run: |
         set -o errexit
@@ -246,7 +249,6 @@ jobs:
 
     - name: Install tanzu cli
       run: |
-        echo $FOO
         $TANZU_VERSION = "v0.25.0"
         mkdir "C:\Program Files\tanzu"       
         $Env:PATH += ";C:\Program Files\tanzu"
@@ -266,6 +268,9 @@ jobs:
         tanzu plugin install test --local $TANZU_HOME/admin-plugins
         tanzu plugin list
         cd c:\Users\installer\
+        dir 
+        cd -
+        cd c:\windows\system32\
         dir 
         cd -
     - name: Test CLI commands
