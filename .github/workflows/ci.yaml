@@ -227,6 +227,7 @@ jobs:
       uses: lewagon/wait-on-check-action@v1.0.0
       with:
           running-workflow-name: 'Test integration'
+          token: ${{ secrets.GITHUB_TOKEN }}
     outputs:
       ipaddress: ${{ steps.cluster.outputs.ipaddress }}
       config: ${{ steps.cluster.outputs.config }}
