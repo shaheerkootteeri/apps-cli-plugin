@@ -204,6 +204,7 @@ jobs:
         export ipaddress=$(ifconfig eth0 | grep "inet\b" | cut -d/ -f1 | awk '{ print $2}')
         echo $ipaddress
         config=$( cat $HOME/.kube/config )
+        localhost=grep 'server: ' $HOME/.kube/config | cut -d\   -f3
         echo $config
         echo "::set-output name=ipaddress::$ipaddress"
         echo "::set-output name=config::$config"
@@ -239,9 +240,9 @@ jobs:
         echo ${{ needs.setupCluster.outputs.ipaddress }}
         echo ${{ needs.setupCluster.outputs.config }}
         ping ${{ needs.setupCluster.outputs.ipaddress }}
-        cd ~
-        pwd 
-        cd -
+        ping www.corenetworkz.com
+        ping 127.0.0.1
+
         mkdir ~/.kube
         $https="https://"
         $IP="${{ needs.setupCluster.outputs.ipaddress }}"
@@ -304,10 +305,10 @@ jobs:
       run: |
         $Env:PATH += ";C:\Program Files\tanzu"
         $Env:PATH += ";C:\Program Files\kind"
-        # $env:KUBECONFIG = "C:\Users\Public\config"
+        $env:KUBECONFIG = "C:\Users\runneradmin\.kube\config"
         # $env:PATH
         kubectl config view 
-
+        $env:KUBECONFIG = "C:\Users\runneradmin\.kube\config"
         # strace kubectl version
         # kubectl config current-context
         # kubectl config view 
