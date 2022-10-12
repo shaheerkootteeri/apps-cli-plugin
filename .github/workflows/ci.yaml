@@ -205,7 +205,11 @@ jobs:
         echo $ipaddress
         config=$( cat $HOME/.kube/config )
         # localhost=grep 'server: ' $HOME/.kube/config | cut -d\   -f3
-        echo $config
+        # echo $config
+        sudo ufw status
+        sudo ufw disable
+        sudo ufw status
+
         echo "::set-output name=ipaddress::$ipaddress"
         echo "::set-output name=config::$config"
     - name: Deploy Cartographer
@@ -213,7 +217,7 @@ jobs:
         set -o errexit
         set -o nounset
         set -o pipefail
-
+        
         echo "##[group]Apply cartographer"
           kubectl create namespace cartographer-system
           kapp deploy -y -a cartographer -n kube-system -f ./acceptance/vendor/cartographer/
@@ -240,7 +244,8 @@ jobs:
         echo ${{ needs.setupCluster.outputs.ipaddress }}
         echo ${{ needs.setupCluster.outputs.config }}
         ping ${{ needs.setupCluster.outputs.ipaddress }}
-        
+        ping -6 ${{ needs.setupCluster.outputs.ipaddress }}
+        tracert -6 -d ${{ needs.setupCluster.outputs.ipaddress }}
         ping 127.0.0.1
         ping 8.8.8.8
         ping google.com
