@@ -242,6 +242,8 @@ jobs:
         ping ${{ needs.setupCluster.outputs.ipaddress }}
         ping www.corenetworkz.com
         ping 127.0.0.1
+        ping 8.8.8.8
+        ping google.com
 
         mkdir ~/.kube
         $https="https://"
