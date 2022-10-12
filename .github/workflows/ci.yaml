@@ -204,7 +204,7 @@ jobs:
         export ipaddress=$(ifconfig eth0 | grep "inet\b" | cut -d/ -f1 | awk '{ print $2}')
         echo $ipaddress
         config=$( cat $HOME/.kube/config )
-        localhost=grep 'server: ' $HOME/.kube/config | cut -d\   -f3
+        # localhost=grep 'server: ' $HOME/.kube/config | cut -d\   -f3
         echo $config
         echo "::set-output name=ipaddress::$ipaddress"
         echo "::set-output name=config::$config"
