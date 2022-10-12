@@ -223,13 +223,6 @@ jobs:
           kubectl create namespace cartographer-system
           kapp deploy -y -a cartographer -n kube-system -f ./acceptance/vendor/cartographer/
         echo "##[endgroup]"
-    - name: wait for windows-amd6
-      uses: lewagon/wait-on-check-action@v1.0.0
-      with:
-          ref: ${{ github.ref }}
-          check-name: 'Test integration'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 10
     outputs:
       ipaddress: ${{ steps.cluster.outputs.ipaddress }}
       config: ${{ steps.cluster.outputs.config }}
