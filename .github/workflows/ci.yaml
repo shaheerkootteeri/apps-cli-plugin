@@ -200,7 +200,7 @@ jobs:
             help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
         EOF
         kubectl cluster-info 
-
+        ifconfig
         export ipaddress=$(ifconfig eth0 | grep "inet\b" | cut -d/ -f1 | awk '{ print $2}')
         echo $ipaddress
         config=$( cat $HOME/.kube/config )
@@ -269,7 +269,7 @@ jobs:
         "@
         echo $config
         New-Item ~\.kube\config -ItemType File -Value $config
-        
+
     - name: Grype scan
       run: |
         bash -c '
