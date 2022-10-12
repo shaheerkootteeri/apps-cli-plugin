@@ -94,6 +94,7 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version: 1.19.x
+
     - name: Generate certs
       run: |
         set -o errexit
@@ -222,6 +223,10 @@ jobs:
           kubectl create namespace cartographer-system
           kapp deploy -y -a cartographer -n kube-system -f ./acceptance/vendor/cartographer/
         echo "##[endgroup]"
+    - name: wait for windows-amd6
+      uses: lewagon/wait-on-check-action@v1.0.0
+      with:
+          running-workflow-name: 'Test integration'
     outputs:
       ipaddress: ${{ steps.cluster.outputs.ipaddress }}
       config: ${{ steps.cluster.outputs.config }}
@@ -315,7 +320,7 @@ jobs:
         tanzu plugin install builder --local $TANZU_HOME/admin-plugins
         tanzu plugin install test --local $TANZU_HOME/admin-plugins
         tanzu plugin list
-    - name: Test CLI commands
+    - name: Test integration
       run: |
         $Env:PATH += ";C:\Program Files\tanzu"
         $Env:PATH += ";C:\Program Files\kind"
