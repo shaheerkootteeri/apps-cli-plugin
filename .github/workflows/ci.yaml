@@ -76,7 +76,7 @@ jobs:
     strategy:
       matrix:
         k8s:
-        - 1.23.5
+        - 1.25.2
     env:
       REGISTRY_NAME: registry.local
       REGISTRY_USERNAME: ruser
@@ -94,10 +94,10 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version: 1.19.x
-    - name: setup DNS
-      run: |
-        ping google.com
-        ping 8.8.8.8
+    # - name: setup DNS
+    #   run: |
+    #     # ping google.com
+    #     # ping 8.8.8.8
 
 
     - name: Generate certs
@@ -252,6 +252,7 @@ jobs:
       run: |
         echo ${{ needs.setupCluster.outputs.ipaddress }}
         echo ${{ needs.setupCluster.outputs.config }}
+        Get-NetAdapter | select Name,Status, LinkSpeed
         ipconfig /flushdns
         netsh winsock reset
         netsh int ip reset
