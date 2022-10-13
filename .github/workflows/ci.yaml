@@ -223,6 +223,9 @@ jobs:
           kubectl create namespace cartographer-system
           kapp deploy -y -a cartographer -n kube-system -f ./acceptance/vendor/cartographer/
         echo "##[endgroup]"
+    - name: Sleep for 30 seconds
+      run: sleep 120s
+      shell: bash
     outputs:
       ipaddress: ${{ steps.cluster.outputs.ipaddress }}
       config: ${{ steps.cluster.outputs.config }}
