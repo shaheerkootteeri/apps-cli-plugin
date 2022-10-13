@@ -76,6 +76,7 @@ jobs:
     strategy:
       matrix:
         k8s:
+        - 1.23.5
         - 1.25.2
     env:
       REGISTRY_NAME: registry.local
@@ -205,16 +206,11 @@ jobs:
             host: "localhost"
             help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
         EOF
-        kubectl cluster-info 
+        # kubectl cluster-info 
         ifconfig
         export ipaddress=$(ifconfig eth0 | grep "inet\b" | cut -d/ -f1 | awk '{ print $2}')
         echo $ipaddress
         config=$( cat $HOME/.kube/config )
-        # localhost=grep 'server: ' $HOME/.kube/config | cut -d\   -f3
-        # echo $config
-        sudo ufw status
-        sudo ufw disable
-        sudo ufw status
 
         echo "::set-output name=ipaddress::$ipaddress"
         echo "::set-output name=config::$config"
