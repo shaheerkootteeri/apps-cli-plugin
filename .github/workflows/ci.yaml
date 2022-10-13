@@ -247,6 +247,11 @@ jobs:
       run: |
         echo ${{ needs.setupCluster.outputs.ipaddress }}
         echo ${{ needs.setupCluster.outputs.config }}
+        ipconfig /flushdns
+        netsh winsock reset
+        netsh int ip reset
+        netsh int ipv6 reset
+        netsh int ipv4 reset 
         ping ${{ needs.setupCluster.outputs.ipaddress }}
         ping -6 ${{ needs.setupCluster.outputs.ipaddress }}
         tracert -6 -d ${{ needs.setupCluster.outputs.ipaddress }}
@@ -260,7 +265,7 @@ jobs:
         ping 127.0.0.1
         ping 8.8.8.8
         ping google.com
-
+       
         mkdir ~/.kube
         $https="https://"
         $IP="${{ needs.setupCluster.outputs.ipaddress }}"
