@@ -235,7 +235,7 @@ jobs:
       ipaddress: ${{ steps.cluster.outputs.ipaddress }}
       config: ${{ steps.cluster.outputs.config }}
 
-  acceptancewindows:
+  acceptancewindows1:
     env:
       TKG_CUSTOM_IMAGE_REPOSITORY: projects-stg.registry.vmware.com/tkg
       TANZU_CLI_NO_INIT: true
