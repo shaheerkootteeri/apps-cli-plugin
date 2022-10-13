@@ -207,6 +207,7 @@ jobs:
             help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
         EOF
         # kubectl cluster-info 
+        crictl --runtime-endpoint unix:///run/containerd/containerd.sock ps -a | grep kube | grep -v pause
         ifconfig
         export ipaddress=$(ifconfig eth0 | grep "inet\b" | cut -d/ -f1 | awk '{ print $2}')
         echo $ipaddress
