@@ -159,7 +159,9 @@ jobs:
     #     # ping google.com
     #     # ping 8.8.8.8
 
-
+    - name: install homebrew
+      run: |
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     - name: Generate certs
       run: |
         set -o errexit
@@ -179,10 +181,11 @@ jobs:
             -profile="intermediate" ./.github/tls/intermediate-csr.json \
             | cfssljson -bare ${CERT_DIR}/signing-ca
           cat ${CERT_DIR}/signing-ca.pem ${CERT_DIR}/root-ca.pem > ${CERT_DIR}/ca.pem
-        echo "##[endgroup]"
+        echo "##[endgroup]"        
         echo "##[group]Install CA"
           # https://ubuntu.com/server/docs/security-trust-store
-          sudo apt-get install -y ca-certificates
+          # sudo apt-get install -y ca-certificates
+          brew install -y ca-certificates 
         echo "##[endgroup]"
         echo "##[group]Generate cert"
           cfssl gencert -ca ${CERT_DIR}/signing-ca.pem -ca-key ${CERT_DIR}/signing-ca-key.pem \
