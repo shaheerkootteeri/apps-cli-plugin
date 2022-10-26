@@ -88,13 +88,13 @@ jobs:
         echo "##[endgroup]"
         echo "##[group]Scan source ."
           grype dir:. --exclude ./hack,./vendor --exclude '**/testdata/**'
-          
-
 
     - name: Install tanzu cli
       run: |
         TANZU_VERSION=$(cat TANZU_VERSION)
         env
+        $TANZU_VERSION
+        ${TANZU_HOME}
         mkdir -p ${TANZU_HOME}
         curl -Lo tanzu-framework.tar.gz https://github.com/vmware-tanzu/tanzu-framework/releases/download/${TANZU_VERSION}/tanzu-framework-darwin-amd64.tar.gz
         tar -xzf tanzu-framework.tar.gz -C ${TANZU_HOME}
