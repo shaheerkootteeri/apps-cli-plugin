@@ -164,6 +164,12 @@ jobs:
         set -o pipefail
         CERT_DIR=$(mktemp -d -t certs.XXXX)
         echo "CERT_DIR=$CERT_DIR" >> $GITHUB_ENV
+        echo ${CERT_DIR}
+        echo ${REGISTRY_NAME}
+        echo ${REGISTRY_USERNAME}
+        echo ${REGISTRY_PASSWORD}
+        echo ${BUNDLE}
+        echo ${OS_ARCH}
         echo "##[group]Install cfssl"
           go install github.com/cloudflare/cfssl/cmd/cfssl@v1.6.2
           go install github.com/cloudflare/cfssl/cmd/cfssljson@v1.6.2
