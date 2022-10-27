@@ -623,389 +623,389 @@ jobs:
       run: kind delete cluster
       if: always()
 
-  acceptancewindows:
-    needs: acceptancewindows1
-    runs-on: windows-latest
-    strategy:
-      matrix:
-        k8s:
-        - 1.21.10
-        - 1.22.7
-        - 1.23.5
-    env:
-      REGISTRY_NAME: registry.local
-      REGISTRY_USERNAME: ruser
-      REGISTRY_PASSWORD: rpass
-      BUNDLE: registry.local/integration-test/hellojar:source
-      TANZU_CLI_NO_INIT: true
-      TANZU_HOME: $HOME/tanzu
-      OS_ARCH: windows-amd64
-      TKG_CUSTOM_IMAGE_REPOSITORY: projects-stg.registry.vmware.com/tkg
-    # defaults:
-    #   run:
-    #     shell: wsl-bash {0}
-    steps:
-    - uses: actions/checkout@v3
-    - uses: vmware-tanzu/carvel-setup-action@v1
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-    - uses: actions/setup-go@v3
-      with:
-        go-version: 1.19.x
-    - name: Download plugin bundle
-      uses: actions/download-artifact@v3
-      with:
-        name: tanzu-apps-plugin.tar.gz 
-    - name: setup Env variables
-      run: |
-        echo "BUNDLE= registry.local/integration-test/hellojar:source" >> $env:GITHUB_ENV
-        # $Env:TANZU_HOME = "C:\Program Files\tanzu"
-        # $Env:PATH += ";C:\Program Files\tanzu"
-        # $Env:TANZU_CLI_NO_INIT = "true"
-        # BUNDLE = "registry.local/integration-test/hellojar:source"
-        # $Env:REGISTRY_NAME= "registry-local"
-        # $Env:REGISTRY_USERNAME= "ruser"
-        # $Env:REGISTRY_PASSWORD= "rpass"
-        # $Env:OS_ARCH= "windows-amd64"
-        # $Env:TKG_CUSTOM_IMAGE_REPOSITORY= "projects-stg.registry.vmware.com/tkg"
-    # - name: Install tanzu cli
-    #   run: |
-    #     TANZU_VERSION=$(cat TANZU_VERSION)
-    #     mkdir -p /root/tanzu
-    #     curl -Lo tanzu-framework.tar.gz https://github.com/vmware-tanzu/tanzu-framework/releases/download/${TANZU_VERSION}/tanzu-framework-linux-amd64.tar.gz
-    #       tar -xzf tanzu-framework.tar.gz -C /root/tanzu
-    #       sudo mv $HOME/tanzu/cli/core/${TANZU_VERSION}/tanzu-core-linux_amd64 /usr/local/bin/tanzu
-    #       chmod +x /usr/local/bin/tanzu
-    #     env
-    #     export ALLOWED_REGISTRY=projects-stg.registry.vmware.com/tkg
-    #     tanzu init
-    #     tanzu plugin sync
-    - name: Install tanzu cli
-      run: |
-        $TANZU_VERSION = "v0.25.0"
-        mkdir "C:\Program Files\tanzu"
-        $Env:PATH += ";C:\Program Files\tanzu"
-        curl -Lo tanzu-framework-windows-amd64.zip https://github.com/vmware-tanzu/tanzu-framework/releases/download/$TANZU_VERSION/tanzu-framework-windows-amd64.zip
-        tar -xf tanzu-framework-windows-amd64.zip
-        cp "cli\core\$TANZU_VERSION\tanzu-core-windows_amd64.exe" "C:\Program Files\tanzu\tanzu.exe"
-        tanzu init
-    - name: Build Version
-      run: echo "BUILD_VERSION=${GITHUB_REF/refs\/tags\//}" >> $Env:GITHUB_ENV
-      if: startsWith(github.ref, 'refs/tags/')
-    - name: Install CLI
-      run: |
+  # acceptancewindows:
+  #   needs: acceptancewindows1
+  #   runs-on: windows-latest
+  #   strategy:
+  #     matrix:
+  #       k8s:
+  #       - 1.21.10
+  #       - 1.22.7
+  #       - 1.23.5
+  #   env:
+  #     REGISTRY_NAME: registry.local
+  #     REGISTRY_USERNAME: ruser
+  #     REGISTRY_PASSWORD: rpass
+  #     BUNDLE: registry.local/integration-test/hellojar:source
+  #     TANZU_CLI_NO_INIT: true
+  #     TANZU_HOME: $HOME/tanzu
+  #     OS_ARCH: windows-amd64
+  #     TKG_CUSTOM_IMAGE_REPOSITORY: projects-stg.registry.vmware.com/tkg
+  #   # defaults:
+  #   #   run:
+  #   #     shell: wsl-bash {0}
+  #   steps:
+  #   - uses: actions/checkout@v3
+  #   - uses: vmware-tanzu/carvel-setup-action@v1
+  #     with:
+  #       token: ${{ secrets.GITHUB_TOKEN }}
+  #   - uses: actions/setup-go@v3
+  #     with:
+  #       go-version: 1.19.x
+  #   - name: Download plugin bundle
+  #     uses: actions/download-artifact@v3
+  #     with:
+  #       name: tanzu-apps-plugin.tar.gz 
+  #   - name: setup Env variables
+  #     run: |
+  #       echo "BUNDLE= registry.local/integration-test/hellojar:source" >> $env:GITHUB_ENV
+  #       # $Env:TANZU_HOME = "C:\Program Files\tanzu"
+  #       # $Env:PATH += ";C:\Program Files\tanzu"
+  #       # $Env:TANZU_CLI_NO_INIT = "true"
+  #       # BUNDLE = "registry.local/integration-test/hellojar:source"
+  #       # $Env:REGISTRY_NAME= "registry-local"
+  #       # $Env:REGISTRY_USERNAME= "ruser"
+  #       # $Env:REGISTRY_PASSWORD= "rpass"
+  #       # $Env:OS_ARCH= "windows-amd64"
+  #       # $Env:TKG_CUSTOM_IMAGE_REPOSITORY= "projects-stg.registry.vmware.com/tkg"
+  #   # - name: Install tanzu cli
+  #   #   run: |
+  #   #     TANZU_VERSION=$(cat TANZU_VERSION)
+  #   #     mkdir -p /root/tanzu
+  #   #     curl -Lo tanzu-framework.tar.gz https://github.com/vmware-tanzu/tanzu-framework/releases/download/${TANZU_VERSION}/tanzu-framework-linux-amd64.tar.gz
+  #   #       tar -xzf tanzu-framework.tar.gz -C /root/tanzu
+  #   #       sudo mv $HOME/tanzu/cli/core/${TANZU_VERSION}/tanzu-core-linux_amd64 /usr/local/bin/tanzu
+  #   #       chmod +x /usr/local/bin/tanzu
+  #   #     env
+  #   #     export ALLOWED_REGISTRY=projects-stg.registry.vmware.com/tkg
+  #   #     tanzu init
+  #   #     tanzu plugin sync
+  #   - name: Install tanzu cli
+  #     run: |
+  #       $TANZU_VERSION = "v0.25.0"
+  #       mkdir "C:\Program Files\tanzu"
+  #       $Env:PATH += ";C:\Program Files\tanzu"
+  #       curl -Lo tanzu-framework-windows-amd64.zip https://github.com/vmware-tanzu/tanzu-framework/releases/download/$TANZU_VERSION/tanzu-framework-windows-amd64.zip
+  #       tar -xf tanzu-framework-windows-amd64.zip
+  #       cp "cli\core\$TANZU_VERSION\tanzu-core-windows_amd64.exe" "C:\Program Files\tanzu\tanzu.exe"
+  #       tanzu init
+  #   - name: Build Version
+  #     run: echo "BUILD_VERSION=${GITHUB_REF/refs\/tags\//}" >> $Env:GITHUB_ENV
+  #     if: startsWith(github.ref, 'refs/tags/')
+  #   - name: Install CLI
+  #     run: |
 
-        tar -xvf tanzu-apps-plugin.tar.gz
-        $Env:PATH += ";C:\Program Files\tanzu"
-        tanzu plugin install apps --local ./windows-amd64 --version v0.0.0-dev
+  #       tar -xvf tanzu-apps-plugin.tar.gz
+  #       $Env:PATH += ";C:\Program Files\tanzu"
+  #       tanzu plugin install apps --local ./windows-amd64 --version v0.0.0-dev
 
-    - name: Setup WSL
-      uses: Vampire/setup-wsl@v1.3.1
-      with:
-         distribution: Ubuntu-20.04
+  #   - name: Setup WSL
+  #     uses: Vampire/setup-wsl@v1.3.1
+  #     with:
+  #        distribution: Ubuntu-20.04
 
-    # - name: Generate certs
-    #   run: |
-    #     mkdir "\cert"  
-    #     $CERT_DIR= "\cert" 
-    #     # Install-Module -Name OpenSSL -Scope CurrentUser -Force
-    #     echo "CERT_DIR=$CERT_DIR" >> $env:GITHUB_ENV
-    #     # Define certificate name
-    #     # Define certificate name
+  #   # - name: Generate certs
+  #   #   run: |
+  #   #     mkdir "\cert"  
+  #   #     $CERT_DIR= "\cert" 
+  #   #     # Install-Module -Name OpenSSL -Scope CurrentUser -Force
+  #   #     echo "CERT_DIR=$CERT_DIR" >> $env:GITHUB_ENV
+  #   #     # Define certificate name
+  #   #     # Define certificate name
 
-    #     $Certname = "tanzu"
-    #     Write-Host "Creating Certifcate $Certname" -ForegroundColor Green
-    #     # Create certificate
-    #     $Cert = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname $Certname -NotAfter (Get-Date).AddDays(1)
-    #     Write-Host "Exporting Certificate $Certname to $env:USERPROFILE\$Certname.pfx" -ForegroundColor Green
-    #     # Set password to export certificate
-    #     $pw = ConvertTo-SecureString -String "Pazzword" -Force -AsPlainText
-    #     # Get thumbprint
-    #     $thumbprint = $Cert.Thumbprint
-    #     # Export certificate
-    #     Export-PfxCertificate -cert cert:\localMachine\my\$thumbprint -FilePath $CERT_DIR\$Certname.pfx -Password $pw
-    #     # pkcs12 -in $env:USERPROFILE\$Certname.pfx -out privateKey.key -nocerts -nodes
-    #     # pkcs12 -in $env:USERPROFILE\$Certname.pfx -out certificate.pem -nokeys -clcerts
-    #     # cp certificate.pem $CERT_DIR\server.pem
-    #     # cp privateKey.key $CERT_DIR\server-key.pem
-    - name: install go
-      shell: wsl-bash {0}
-      run: |
-        VERSION=1.19
-        OS=linux
-        ARCH=amd64
+  #   #     $Certname = "tanzu"
+  #   #     Write-Host "Creating Certifcate $Certname" -ForegroundColor Green
+  #   #     # Create certificate
+  #   #     $Cert = New-SelfSignedCertificate -certstorelocation cert:\localmachine\my -dnsname $Certname -NotAfter (Get-Date).AddDays(1)
+  #   #     Write-Host "Exporting Certificate $Certname to $env:USERPROFILE\$Certname.pfx" -ForegroundColor Green
+  #   #     # Set password to export certificate
+  #   #     $pw = ConvertTo-SecureString -String "Pazzword" -Force -AsPlainText
+  #   #     # Get thumbprint
+  #   #     $thumbprint = $Cert.Thumbprint
+  #   #     # Export certificate
+  #   #     Export-PfxCertificate -cert cert:\localMachine\my\$thumbprint -FilePath $CERT_DIR\$Certname.pfx -Password $pw
+  #   #     # pkcs12 -in $env:USERPROFILE\$Certname.pfx -out privateKey.key -nocerts -nodes
+  #   #     # pkcs12 -in $env:USERPROFILE\$Certname.pfx -out certificate.pem -nokeys -clcerts
+  #   #     # cp certificate.pem $CERT_DIR\server.pem
+  #   #     # cp privateKey.key $CERT_DIR\server-key.pem
+  #   - name: install go
+  #     shell: wsl-bash {0}
+  #     run: |
+  #       VERSION=1.19
+  #       OS=linux
+  #       ARCH=amd64
 
-        cd $HOME
-        wget https://storage.googleapis.com/golang/go$VERSION.$OS-$ARCH.tar.gz
-        tar -xvf go$VERSION.$OS-$ARCH.tar.gz
-        mv go go-$VERSION
-        sudo mv go-$VERSION /usr/local
+  #       cd $HOME
+  #       wget https://storage.googleapis.com/golang/go$VERSION.$OS-$ARCH.tar.gz
+  #       tar -xvf go$VERSION.$OS-$ARCH.tar.gz
+  #       mv go go-$VERSION
+  #       sudo mv go-$VERSION /usr/local
 
-        echo 'export GOROOT=/usr/local/go-1.19' >> $HOME/.bashrc
-        echo 'export GOPATH=$HOME/projects/go' >> $HOME/.bashrc
-        echo 'export GOBIN=$GOPATH/bin' >> $HOME/.bashrc
-        echo 'export PATH=$PATH:$GOROOT/bin' >> $HOME/.bashrc
-        echo 'export PATH=$PATH:$HOME/projects/go/bin' >> $HOME/.bashrc
-    - name: Generate certs
-      shell: wsl-bash {0}
-      run: |
-        set -o errexit
-        set -o nounset
-        set -o pipefail
-        export REGISTRY_NAME=registry.local
-        export BUNDLE=registry.local/integration-test/hellojar:source
-        export GOROOT=/usr/local/go-1.19
-        export GOPATH=$HOME/projects/go
-        export GOBIN=$GOPATH/bin
-        export PATH=$PATH:$GOROOT/bin
-        export PATH=$PATH:$HOME/projects/go/bin
-        sudo apt-get update -y
-        sudo apt install gcc -y
-        sudo apt-get update -y
-        CERT_DIR=$(mktemp -d -t certs.XXXX)
-        # echo "CERT_DIR=$CERT_DIR" >> $GITHUB_ENV
-        echo "##[group]Install cfssl"
-          go install github.com/cloudflare/cfssl/cmd/cfssl@v1.6.2
-          go install github.com/cloudflare/cfssl/cmd/cfssljson@v1.6.2
-        echo "##[endgroup]"
-        echo "##[group]Generate CA"
-          cfssl gencert -initca ./.github/tls/root-csr.json \
-            | cfssljson -bare ${CERT_DIR}/root-ca
-          cfssl gencert -ca ${CERT_DIR}/root-ca.pem -ca-key ${CERT_DIR}/root-ca-key.pem \
-            -config=".github/tls/config.json" \
-            -profile="intermediate" ./.github/tls/intermediate-csr.json \
-            | cfssljson -bare ${CERT_DIR}/signing-ca
-          cat ${CERT_DIR}/signing-ca.pem ${CERT_DIR}/root-ca.pem > ${CERT_DIR}/ca.pem
-        echo "##[endgroup]"
-        echo "##[group]Install CA"
-          # https://ubuntu.com/server/docs/security-trust-store
-          sudo apt-get install -y ca-certificates
-        echo "##[endgroup]"
-        echo "##[group]Generate cert"
-          cfssl gencert -ca ${CERT_DIR}/signing-ca.pem -ca-key ${CERT_DIR}/signing-ca-key.pem \
-            -config=".github/tls/config.json" \
-            -profile="server" \
-            -hostname="${REGISTRY_NAME},local-registry" \
-            .github/tls/server-csr.json \
-            | cfssljson -bare ${CERT_DIR}/server
-        echo "##[endgroup]"
-    - name: install docker
-      shell: wsl-bash {0}
-      run: |
-        sudo apt-get update -y
-        sudo apt-get install ca-certificates curl gnupg lsb-release -y
-        sudo mkdir -p /etc/apt/keyrings
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-        sudo apt-get update -y
-        sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
-        # sudo update-alternatives --config iptables
-        sudo service docker start
-        sudo service docker status
-    - name: Setup local registry
-      shell: bash
-      run: |
-        set -o errexit
-        set -o nounset
-        set -o pipefail
-        export REGISTRY_NAME=registry.local
-        export REGISTRY_USERNAME=ruser
-        export REGISTRY_PASSWORD=rpass
-        export BUNDLE=registry.local/integration-test/hellojar:source
-        # Create password file
-        REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
-        docker run \
-        --entrypoint htpasswd --platform=linux \
-        httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
+  #       echo 'export GOROOT=/usr/local/go-1.19' >> $HOME/.bashrc
+  #       echo 'export GOPATH=$HOME/projects/go' >> $HOME/.bashrc
+  #       echo 'export GOBIN=$GOPATH/bin' >> $HOME/.bashrc
+  #       echo 'export PATH=$PATH:$GOROOT/bin' >> $HOME/.bashrc
+  #       echo 'export PATH=$PATH:$HOME/projects/go/bin' >> $HOME/.bashrc
+  #   - name: Generate certs
+  #     shell: wsl-bash {0}
+  #     run: |
+  #       set -o errexit
+  #       set -o nounset
+  #       set -o pipefail
+  #       export REGISTRY_NAME=registry.local
+  #       export BUNDLE=registry.local/integration-test/hellojar:source
+  #       export GOROOT=/usr/local/go-1.19
+  #       export GOPATH=$HOME/projects/go
+  #       export GOBIN=$GOPATH/bin
+  #       export PATH=$PATH:$GOROOT/bin
+  #       export PATH=$PATH:$HOME/projects/go/bin
+  #       sudo apt-get update -y
+  #       sudo apt install gcc -y
+  #       sudo apt-get update -y
+  #       CERT_DIR=$(mktemp -d -t certs.XXXX)
+  #       # echo "CERT_DIR=$CERT_DIR" >> $GITHUB_ENV
+  #       echo "##[group]Install cfssl"
+  #         go install github.com/cloudflare/cfssl/cmd/cfssl@v1.6.2
+  #         go install github.com/cloudflare/cfssl/cmd/cfssljson@v1.6.2
+  #       echo "##[endgroup]"
+  #       echo "##[group]Generate CA"
+  #         cfssl gencert -initca ./.github/tls/root-csr.json \
+  #           | cfssljson -bare ${CERT_DIR}/root-ca
+  #         cfssl gencert -ca ${CERT_DIR}/root-ca.pem -ca-key ${CERT_DIR}/root-ca-key.pem \
+  #           -config=".github/tls/config.json" \
+  #           -profile="intermediate" ./.github/tls/intermediate-csr.json \
+  #           | cfssljson -bare ${CERT_DIR}/signing-ca
+  #         cat ${CERT_DIR}/signing-ca.pem ${CERT_DIR}/root-ca.pem > ${CERT_DIR}/ca.pem
+  #       echo "##[endgroup]"
+  #       echo "##[group]Install CA"
+  #         # https://ubuntu.com/server/docs/security-trust-store
+  #         sudo apt-get install -y ca-certificates
+  #       echo "##[endgroup]"
+  #       echo "##[group]Generate cert"
+  #         cfssl gencert -ca ${CERT_DIR}/signing-ca.pem -ca-key ${CERT_DIR}/signing-ca-key.pem \
+  #           -config=".github/tls/config.json" \
+  #           -profile="server" \
+  #           -hostname="${REGISTRY_NAME},local-registry" \
+  #           .github/tls/server-csr.json \
+  #           | cfssljson -bare ${CERT_DIR}/server
+  #       echo "##[endgroup]"
+  #   - name: install docker
+  #     shell: wsl-bash {0}
+  #     run: |
+  #       sudo apt-get update -y
+  #       sudo apt-get install ca-certificates curl gnupg lsb-release -y
+  #       sudo mkdir -p /etc/apt/keyrings
+  #       curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  #       echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  #       sudo apt-get update -y
+  #       sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
+  #       # sudo update-alternatives --config iptables
+  #       sudo service docker start
+  #       sudo service docker status
+  #   - name: Setup local registry
+  #     shell: bash
+  #     run: |
+  #       set -o errexit
+  #       set -o nounset
+  #       set -o pipefail
+  #       export REGISTRY_NAME=registry.local
+  #       export REGISTRY_USERNAME=ruser
+  #       export REGISTRY_PASSWORD=rpass
+  #       export BUNDLE=registry.local/integration-test/hellojar:source
+  #       # Create password file
+  #       REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
+  #       docker run \
+  #       --entrypoint htpasswd --platform=linux \
+  #       httpd:2 -Bbn ${REGISTRY_USERNAME} ${REGISTRY_PASSWORD} > ${REGISTRY_HTPWD}/htpasswd
         
-        # Run a registry.
-        docker run -d \
-          --restart=always \
-          --name local-registry \
-          -v ${CERT_DIR}:/certs \
-          -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
-          -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/server.pem \
-          -e REGISTRY_HTTP_TLS_KEY=/certs/server-key.pem \
-          -p "443:443" \
-          registry:2
-        # Make the $REGISTRY_NAME -> local-registry
-        echo "$(hostname -I | cut -d' ' -f1) $REGISTRY_NAME" | sudo tee -a /etc/hosts
-    # - name: set Experimental as true
-    #   run: |
-    #     cat 'C:\ProgramData\Docker\Config\daemon.json'
-    #     $json = Get-Content 'C:\ProgramData\Docker\Config\daemon.json' | Out-String | ConvertFrom-Json
-    #     $json | Add-Member -Type NoteProperty -Name 'experimental' -Value $true
-    #     $json | ConvertTo-Json | set-content 'C:\ProgramData\Docker\Config\daemon.json'
-    #     cat 'C:\ProgramData\Docker\Config\daemon.json'
-    #     restart-service *docker*
+  #       # Run a registry.
+  #       docker run -d \
+  #         --restart=always \
+  #         --name local-registry \
+  #         -v ${CERT_DIR}:/certs \
+  #         -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
+  #         -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/server.pem \
+  #         -e REGISTRY_HTTP_TLS_KEY=/certs/server-key.pem \
+  #         -p "443:443" \
+  #         registry:2
+  #       # Make the $REGISTRY_NAME -> local-registry
+  #       echo "$(hostname -I | cut -d' ' -f1) $REGISTRY_NAME" | sudo tee -a /etc/hosts
+  #   # - name: set Experimental as true
+  #   #   run: |
+  #   #     cat 'C:\ProgramData\Docker\Config\daemon.json'
+  #   #     $json = Get-Content 'C:\ProgramData\Docker\Config\daemon.json' | Out-String | ConvertFrom-Json
+  #   #     $json | Add-Member -Type NoteProperty -Name 'experimental' -Value $true
+  #   #     $json | ConvertTo-Json | set-content 'C:\ProgramData\Docker\Config\daemon.json'
+  #   #     cat 'C:\ProgramData\Docker\Config\daemon.json'
+  #   #     restart-service *docker*
         
-    # - name: Setup local registry
-    #   shell: bash
-    #   run: |
-    #     docker version
-    #     set -o errexit
-    #     set -o nounset
-    #     set -o pipefail
-    #     # Create password file
-    #     REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
-    #     REGISTRY_NAME="registry-local"
-    #     REGISTRY_USERNAME="ruser"
-    #     REGISTRY_PASSWORD="rpass"
-    #     docker info
-    #     docker version -f '{{.Server.Experimental}}'
-    #     # sudo service docker restart
+  #   # - name: Setup local registry
+  #   #   shell: bash
+  #   #   run: |
+  #   #     docker version
+  #   #     set -o errexit
+  #   #     set -o nounset
+  #   #     set -o pipefail
+  #   #     # Create password file
+  #   #     REGISTRY_HTPWD=$(mktemp -d -t htpwd.XXXX)
+  #   #     REGISTRY_NAME="registry-local"
+  #   #     REGISTRY_USERNAME="ruser"
+  #   #     REGISTRY_PASSWORD="rpass"
+  #   #     docker info
+  #   #     docker version -f '{{.Server.Experimental}}'
+  #   #     # sudo service docker restart
         
-    #     # Run a registry.
-    #     docker run -d \
-    #       --restart=always \
-    #       --name local-registry \
-    #       -v ${CERT_DIR}:/certs \
-    #       -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
-    #       -e REGISTRY_HTTP_TLS_CERTIFICATE=/cert/tanzu.pfx \
-    #       -e REGISTRY_HTTP_TLS_KEY=/certs/tanzu.pfx \
-    #       -p "443:443" \
-    #       registry:2
-    #     # Make the $REGISTRY_NAME -> local-registry
-    #     echo "$(hostname -I | cut -d' ' -f1) $REGISTRY_NAME" | sudo tee -a /etc/hosts
+  #   #     # Run a registry.
+  #   #     docker run -d \
+  #   #       --restart=always \
+  #   #       --name local-registry \
+  #   #       -v ${CERT_DIR}:/certs \
+  #   #       -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
+  #   #       -e REGISTRY_HTTP_TLS_CERTIFICATE=/cert/tanzu.pfx \
+  #   #       -e REGISTRY_HTTP_TLS_KEY=/certs/tanzu.pfx \
+  #   #       -p "443:443" \
+  #   #       registry:2
+  #   #     # Make the $REGISTRY_NAME -> local-registry
+  #   #     echo "$(hostname -I | cut -d' ' -f1) $REGISTRY_NAME" | sudo tee -a /etc/hosts
 
-    # - name: Install kind
-    #   run: |
-    #     mkdir "C:\Program Files\kind"
-    #     $Env:PATH += ";C:\Program Files\kind"
-    #     curl.exe -Lo kind-windows-amd64.exe https://kind.sigs.k8s.io/dl/v0.16.0/kind-windows-amd64
-    #     Move-Item .\kind-windows-amd64.exe "c:\Program Files\kind\kind.exe"
-    # - name: Create Cluster
-    #   shell: bash
-    #   run: |
-    #     set -o errexit
-    #     set -o nounset
-    #     set -o pipefail
-    #     docker version
+  #   # - name: Install kind
+  #   #   run: |
+  #   #     mkdir "C:\Program Files\kind"
+  #   #     $Env:PATH += ";C:\Program Files\kind"
+  #   #     curl.exe -Lo kind-windows-amd64.exe https://kind.sigs.k8s.io/dl/v0.16.0/kind-windows-amd64
+  #   #     Move-Item .\kind-windows-amd64.exe "c:\Program Files\kind\kind.exe"
+  #   # - name: Create Cluster
+  #   #   shell: bash
+  #   #   run: |
+  #   #     set -o errexit
+  #   #     set -o nounset
+  #   #     set -o pipefail
+  #   #     docker version
 
-    #     # CERT_DIR="d/cert"
-    #     # KinD configuration.
-    #     # create a cluster with the local registry enabled in containerd
-    #     cat <<EOF | kind create cluster --config=-
-    #     kind: Cluster
-    #     apiVersion: kind.x-k8s.io/v1alpha4
-    #     containerdConfigPatches:
-    #     - |-
-    #       [plugins."io.containerd.grpc.v1.cri".registry.mirrors."${REGISTRY_NAME}"]
-    #         endpoint = ["https://local-registry"]
-    #     - |-
-    #       [plugins."io.containerd.grpc.v1.cri".registry.configs."local-registry".tls]
-    #         ca_file  = "/etc/docker/certs.d/local-registry/ca.pem"
-    #     nodes:
-    #     - role: control-plane
-    #       image: kindest/node:v${{ matrix.k8s }}
-    #       extraMounts:
-    #       - containerPath: /etc/docker/certs.d/local-registry
-    #         hostPath: ${CERT_DIR}
-    #     EOF
+  #   #     # CERT_DIR="d/cert"
+  #   #     # KinD configuration.
+  #   #     # create a cluster with the local registry enabled in containerd
+  #   #     cat <<EOF | kind create cluster --config=-
+  #   #     kind: Cluster
+  #   #     apiVersion: kind.x-k8s.io/v1alpha4
+  #   #     containerdConfigPatches:
+  #   #     - |-
+  #   #       [plugins."io.containerd.grpc.v1.cri".registry.mirrors."${REGISTRY_NAME}"]
+  #   #         endpoint = ["https://local-registry"]
+  #   #     - |-
+  #   #       [plugins."io.containerd.grpc.v1.cri".registry.configs."local-registry".tls]
+  #   #         ca_file  = "/etc/docker/certs.d/local-registry/ca.pem"
+  #   #     nodes:
+  #   #     - role: control-plane
+  #   #       image: kindest/node:v${{ matrix.k8s }}
+  #   #       extraMounts:
+  #   #       - containerPath: /etc/docker/certs.d/local-registry
+  #   #         hostPath: ${CERT_DIR}
+  #   #     EOF
  
-    #     # connect the registry to the cluster network
-    #     docker network connect kind local-registry
+  #   #     # connect the registry to the cluster network
+  #   #     docker network connect kind local-registry
  
-    #     # Document the local registry
-    #     # https://github.com/kubernetes/enhancements/tree/master/keps/sig-cluster-lifecycle/generic/1755-communicating-a-local-registry
-    #     cat <<EOF | kubectl apply -f -
-    #     apiVersion: v1
-    #     kind: ConfigMap
-    #     metadata:
-    #       name: local-registry-hosting
-    #       namespace: kube-public
-    #     data:
-    #       localRegistryHosting.v1: |
-    #         host: "localhost"
-    #         help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
-    #     EOF
-    - name: Install kind
-      shell: wsl-bash {0}
-      run: |
-        cd $(mktemp -d -t kind.XXXX)
-        curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-$(go env GOHOSTOS)-$(go env GOHOSTARCH)
-        chmod +x ./kind
-        sudo mv ./kind /usr/local/bin
-        cd -
-    - name: Create Cluster
-      shell: wsl-bash {0}
-      run: |
-        set -o errexit
-        set -o nounset
-        set -o pipefail
+  #   #     # Document the local registry
+  #   #     # https://github.com/kubernetes/enhancements/tree/master/keps/sig-cluster-lifecycle/generic/1755-communicating-a-local-registry
+  #   #     cat <<EOF | kubectl apply -f -
+  #   #     apiVersion: v1
+  #   #     kind: ConfigMap
+  #   #     metadata:
+  #   #       name: local-registry-hosting
+  #   #       namespace: kube-public
+  #   #     data:
+  #   #       localRegistryHosting.v1: |
+  #   #         host: "localhost"
+  #   #         help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
+  #   #     EOF
+  #   - name: Install kind
+  #     shell: wsl-bash {0}
+  #     run: |
+  #       cd $(mktemp -d -t kind.XXXX)
+  #       curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-$(go env GOHOSTOS)-$(go env GOHOSTARCH)
+  #       chmod +x ./kind
+  #       sudo mv ./kind /usr/local/bin
+  #       cd -
+  #   - name: Create Cluster
+  #     shell: wsl-bash {0}
+  #     run: |
+  #       set -o errexit
+  #       set -o nounset
+  #       set -o pipefail
 
-        # KinD configuration.
-        # create a cluster with the local registry enabled in containerd
-        cat <<EOF | kind create cluster --config=-
-        kind: Cluster
-        apiVersion: kind.x-k8s.io/v1alpha4
-        containerdConfigPatches:
-        - |-
-          [plugins."io.containerd.grpc.v1.cri".registry.mirrors."${REGISTRY_NAME}"]
-            endpoint = ["https://local-registry"]
-        - |-
-          [plugins."io.containerd.grpc.v1.cri".registry.configs."local-registry".tls]
-            ca_file  = "/etc/docker/certs.d/local-registry/ca.pem"
-        nodes:
-        - role: control-plane
-          image: kindest/node:v${{ matrix.k8s }}
-          extraMounts:
-          - containerPath: /etc/docker/certs.d/local-registry
-            hostPath: ${CERT_DIR}
-        EOF
+  #       # KinD configuration.
+  #       # create a cluster with the local registry enabled in containerd
+  #       cat <<EOF | kind create cluster --config=-
+  #       kind: Cluster
+  #       apiVersion: kind.x-k8s.io/v1alpha4
+  #       containerdConfigPatches:
+  #       - |-
+  #         [plugins."io.containerd.grpc.v1.cri".registry.mirrors."${REGISTRY_NAME}"]
+  #           endpoint = ["https://local-registry"]
+  #       - |-
+  #         [plugins."io.containerd.grpc.v1.cri".registry.configs."local-registry".tls]
+  #           ca_file  = "/etc/docker/certs.d/local-registry/ca.pem"
+  #       nodes:
+  #       - role: control-plane
+  #         image: kindest/node:v${{ matrix.k8s }}
+  #         extraMounts:
+  #         - containerPath: /etc/docker/certs.d/local-registry
+  #           hostPath: ${CERT_DIR}
+  #       EOF
 
-        # connect the registry to the cluster network
-        docker network connect kind local-registry
+  #       # connect the registry to the cluster network
+  #       docker network connect kind local-registry
 
-        # Document the local registry
-        # https://github.com/kubernetes/enhancements/tree/master/keps/sig-cluster-lifecycle/generic/1755-communicating-a-local-registry
-        cat <<EOF | kubectl apply -f -
-        apiVersion: v1
-        kind: ConfigMap
-        metadata:
-          name: local-registry-hosting
-          namespace: kube-public
-        data:
-          localRegistryHosting.v1: |
-            host: "localhost"
-            help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
-        EOF
-    - name: Deploy Cartographer
-      shell: bash
-      run: |
-        set -o errexit
-        set -o nounset
-        set -o pipefail
+  #       # Document the local registry
+  #       # https://github.com/kubernetes/enhancements/tree/master/keps/sig-cluster-lifecycle/generic/1755-communicating-a-local-registry
+  #       cat <<EOF | kubectl apply -f -
+  #       apiVersion: v1
+  #       kind: ConfigMap
+  #       metadata:
+  #         name: local-registry-hosting
+  #         namespace: kube-public
+  #       data:
+  #         localRegistryHosting.v1: |
+  #           host: "localhost"
+  #           help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
+  #       EOF
+  #   - name: Deploy Cartographer
+  #     shell: bash
+  #     run: |
+  #       set -o errexit
+  #       set -o nounset
+  #       set -o pipefail
  
-        echo "##[group]Apply cartographer"
-          kubectl create namespace cartographer-system
-          kapp deploy -y -a cartographer -n kube-system -f ./acceptance/vendor/cartographer/
-        echo "##[endgroup]"
-    - name: Test CLI commands
-      run: |
-        $Env:PATH += ";C:\Program Files\tanzu"
-        $Env:PATH += ";C:\Program Files\kind"
-        echo "##[group]Integration Test"
-          make integration-test
-        echo "##[endgroup]"
-      continue-on-error: false
-    - name: Delete Gracefully
-      run: |
-        $Env:PATH += ";C:\Program Files\tanzu"
+  #       echo "##[group]Apply cartographer"
+  #         kubectl create namespace cartographer-system
+  #         kapp deploy -y -a cartographer -n kube-system -f ./acceptance/vendor/cartographer/
+  #       echo "##[endgroup]"
+  #   - name: Test CLI commands
+  #     run: |
+  #       $Env:PATH += ";C:\Program Files\tanzu"
+  #       $Env:PATH += ";C:\Program Files\kind"
+  #       echo "##[group]Integration Test"
+  #         make integration-test
+  #       echo "##[endgroup]"
+  #     continue-on-error: false
+  #   - name: Delete Gracefully
+  #     run: |
+  #       $Env:PATH += ";C:\Program Files\tanzu"
 
-        echo "##[group]Delete workload"
-          printf 'y' | tanzu apps workload delete petclinic
-        echo "##[endgroup]"
-        echo "##[group]Delete cartographer"
-          kapp delete -y -a cartographer -n kube-system
-          kubectl delete namespace cartographer-system
-        echo "##[endgroup]"
-      if: always()
-    - name: Cleanup cluster
-      run: |
-        $Env:PATH += ";C:\Program Files\kind"
-        kind delete cluster
-      if: always()
+  #       echo "##[group]Delete workload"
+  #         printf 'y' | tanzu apps workload delete petclinic
+  #       echo "##[endgroup]"
+  #       echo "##[group]Delete cartographer"
+  #         kapp delete -y -a cartographer -n kube-system
+  #         kubectl delete namespace cartographer-system
+  #       echo "##[endgroup]"
+  #     if: always()
+  #   - name: Cleanup cluster
+  #     run: |
+  #       $Env:PATH += ";C:\Program Files\kind"
+  #       kind delete cluster
+  #     if: always()
 
   create-release:
     needs:
