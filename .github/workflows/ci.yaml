@@ -67,9 +67,15 @@ jobs:
         retention-days: 1
     - name: Install
       run: |
-        BUILD_SHA_SHORT=$(git rev-parse --short HEAD)
-        BUILD_VERSION=$(cat APPS_PLUGIN_VERSION)+dev-$BUILD_SHA_SHORT
-        tanzu plugin install apps --version $BUILD_VERSION --local ./artifacts/linux-amd64
+        if [[ ${BUILD_VERSION} ]]; then
+          echo $BUILD_VERSION
+          tanzu plugin install apps --version $BUILD_VERSION --local ./artifacts/published/linux-amd64
+        else           
+          BUILD_SHA_SHORT=$(git rev-parse --short HEAD)
+          BUILD_VERSION=$(cat APPS_PLUGIN_VERSION)+dev-$BUILD_SHA_SHORT
+          echo $BUILD_VERSION
+          tanzu plugin install apps --version $BUILD_VERSION --local ./artifacts/published/linux-amd64
+        fi
     - name: Verify docs
       run: |
         rm -rf docs/command-reference
@@ -126,8 +132,7 @@ jobs:
         $BUILD_SHA_SHORT=git rev-parse --short HEAD
         $APP_PLUGIN_VERSION=type .\APPS_PLUGIN_VERSION
         $BUILD_VERSION=$APP_PLUGIN_VERSION+'+dev-'+$BUILD_SHA_SHORT
-        tanzu plugin install apps --version $(BUILD_VERSION) --local ./artifacts/windows-amd64
-      continue-on-error: true
+        tanzu plugin install apps --version $BUILD_VERSION --local ./artifacts/published/windows-amd64
 
   unit-macos:
     env:
@@ -168,10 +173,15 @@ jobs:
       run: make publish
     - name: Install
       run: |
-        BUILD_SHA_SHORT=$(git rev-parse --short HEAD)
-        BUILD_VERSION=$(cat APPS_PLUGIN_VERSION)+dev-$BUILD_SHA_SHORT
-        tanzu plugin install apps --version $(BUILD_VERSION) --local ./artifacts/darwin-amd64
-      continue-on-error: true
+        if [[ ${BUILD_VERSION} ]]; then
+          echo $BUILD_VERSION
+          tanzu plugin install apps --version $BUILD_VERSION --local ./artifacts/published/darwin-amd64
+        else           
+          BUILD_SHA_SHORT=$(git rev-parse --short HEAD)
+          BUILD_VERSION=$(cat APPS_PLUGIN_VERSION)+dev-$BUILD_SHA_SHORT
+          echo $BUILD_VERSION
+          tanzu plugin install apps --version $BUILD_VERSION --local ./artifacts/published/darwin-amd64
+        fi
 
   acceptance:
     needs: [unit-ubuntu, unit-windows, unit-macos]
